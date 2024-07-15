@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Select from 'react-select';
 import {
   Input,
   Box,
@@ -15,6 +16,7 @@ import {
   FormControl,
   InputLabel,
   Modal,
+  List,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -27,7 +29,7 @@ function Project(props) {
     duration: "",
     client_id: "",
     team_id: "",
-    tech_id: "",
+    tech_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -35,11 +37,28 @@ function Project(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [Optionid, setOptionid] = useState([]);
+  const [tech_id, settech_id] = useState([]);
 
+  
   useEffect(() => {
     getData();
+    getDataMultiSelect();
   }, []);
-
+  
+  const getDataMultiSelect = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/api/technology`);
+      // console.log(response.data, "#$%^##");
+      setOptionid(response.data.map((tech) => ({
+        label:tech.name,
+        value: tech.tech_id,
+      })));
+      
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/project/`);
@@ -101,6 +120,13 @@ function Project(props) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleChangeMultiSelect = (selectedOption) => {
+    settech_id(selectedOption);
+    console.log(tech_id,'ywiudddi');
+    setFormData({...formData, tech_id: selectedOption.map((o) => o.value) });
+
   };
 
   const handleSubmit = () => {
@@ -207,7 +233,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl sx={{ margin: 2 }}>
+          {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="tech-id">Tech Id</InputLabel>
             <Input
               id="tech-id"
@@ -215,7 +241,15 @@ function Project(props) {
               value={formData.tech_id}
               onChange={handleChange}
             />
-          </FormControl>
+          </FormControl> */}
+          <Select isMulti
+          isSearchable
+          value={tech_id}
+        // defaultValue={selectedOption}
+        placeholder="Tech Id:Enter The Technology Name"
+        onChange={handleChangeMultiSelect}
+        options={Optionid}
+      />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button variant="contained" color="success" onClick={handleSubmit}>
               {editMode ? "Update" : "Save"}

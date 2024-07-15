@@ -16,6 +16,9 @@ import {
   InputLabel,
   Modal,
   TextField,
+  Checkbox,
+  ListItemText,
+  
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -33,7 +36,7 @@ function Project(props) {
     client_id: "",
     due_date: "",
     total_amount: "",
-    status: "",
+    status: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -46,6 +49,15 @@ function Project(props) {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [client_id, setclient_id] = React.useState("");
+  const [statusOptions, setStatusOptions] = useState([
+    "java",
+    "python",
+    "react",
+    "javascript",
+    "mongodb",
+    "MySQL",
+    "Material Ui",
+  ]);
 
   useEffect(() => {
     getData();
@@ -84,6 +96,28 @@ function Project(props) {
       });
   }
 
+  const updateDataToServer = async (invoice_id) => {
+    try {
+      await axios.put(`${base_url}/client/invoice/`, formData);
+      getData();
+      alert("Invoice updated Successfully");
+    } catch (err) {
+      console.error("Error updating client:", err);
+    }
+  };
+
+  const deleteDataFromServer = async (invoice_id) => {
+    try {
+      await axios.delete(
+        `${base_url}/client/invoice/?delete=${invoice_id}`,formData
+      );
+      getData();
+      alert("Invoice deleted Successfully");
+    } catch (err) {
+      console.error("Error deleting client:", err);
+    }
+  };
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
     setEditMode(false);
@@ -104,6 +138,14 @@ function Project(props) {
     });
   };
 
+  const handleChangeStatus = (event) => {
+    const { target: { value } } = event;
+    setFormData({
+      ...formData,
+      status: typeof value === 'string' ? value.split(',') : value,
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -114,6 +156,7 @@ function Project(props) {
 
   const handleSubmit = () => {
     if (editMode) {
+      updateDataToServer();
       const updatedData = [...tableData];
       updatedData[editIndex] = formData;
       setTableData(updatedData);
@@ -142,10 +185,11 @@ function Project(props) {
     }
   };
 
-  const handleDelete = (index) => {
-    const updatedData = [...tableData];
-    updatedData.splice(index, 1);
-    setTableData(updatedData);
+  const handleDelete = (invoice_id) => {
+   deleteDataFromServer(invoice_id);
+    // const updatedData = [...tableData];
+    // updatedData.splice(index, 1);
+    // setTableData(updatedData);
   };
 
   const handleInvoiceClick = (id) => {
@@ -349,7 +393,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl sx={{ margin: 2 }}>
+          {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="invoice-number">status</InputLabel>
             <Input
               id="status"
@@ -357,6 +401,25 @@ function Project(props) {
               value={formData.status}
               onChange={handleChange}
             />
+          </FormControl> */}
+
+<FormControl sx={{ margin: 2,width: 200  }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              label="Status"
+              multiple
+              value={formData.status}
+              onChange={handleChangeStatus}
+              input={<Input label="Status" />}
+              renderValue={(selected) => selected.join(", ")}
+            >
+              {statusOptions.map((status) => (
+                <MenuItem key={status} value={status}>
+                  <Checkbox checked={formData.status.indexOf(status) > -1} />
+                  <ListItemText primary={status} />
+                </MenuItem>
+              ))}
+            </Select>
           </FormControl>
 
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
@@ -387,7 +450,7 @@ function Project(props) {
                 Amount
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Status
+              Status
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
@@ -428,7 +491,7 @@ function Project(props) {
                     {row.total_amount}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.status}
+                  {row.status.join(", ")}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     <IconButton
@@ -439,7 +502,7 @@ function Project(props) {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(row.invoice_id)}
                       aria-label="delete"
                       sx={{ color: "red" }}
                     >
