@@ -16,9 +16,6 @@ import {
   InputLabel,
   Modal,
   TextField,
-  Checkbox,
-  ListItemText,
-  
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,6 +26,7 @@ import axios from "axios";
 import base_url from "../utils/API";
 
 import Select from "@mui/material/Select";
+import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 
 function Project(props) {
@@ -36,7 +34,8 @@ function Project(props) {
     client_id: "",
     due_date: "",
     total_amount: "",
-    status: [],
+    status: "",
+    invoice_item_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -49,20 +48,32 @@ function Project(props) {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [client_id, setclient_id] = React.useState("");
-  const [statusOptions, setStatusOptions] = useState([
-    "java",
-    "python",
-    "react",
-    "javascript",
-    "mongodb",
-    "MySQL",
-    "Material Ui",
-  ]);
+  const [invoiceItems, setInvoiceItems] = useState([]);
+  const [Option, setOption] = useState([]);
+
 
   useEffect(() => {
     getData();
     getclient();
+    getDataMultiInvoiceItems();
   }, []);
+
+  const getDataMultiInvoiceItems = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/invoice_item/`);
+      console.log(response.data,'invice');
+      setOption(
+        response.data.map((item_invoice) => ({
+          label: item_invoice.project_name,
+          value: item_invoice.invoice_item_id,
+        }))
+      );
+    } catch (err) {
+      console.log(err);
+      console.error("Error fetching data:", err);
+    }
+  };
+
 
   const getclient = async () => {
     try {
@@ -75,7 +86,7 @@ function Project(props) {
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/invoice/`);
-      console.log(response.data);
+      console.log(response.data,'table data');
       setTableData(response.data);
     } catch (err) {
       console.log(err);
@@ -109,13 +120,20 @@ function Project(props) {
   const deleteDataFromServer = async (invoice_id) => {
     try {
       await axios.delete(
-        `${base_url}/client/invoice/?delete=${invoice_id}`,formData
+        `${base_url}/client/invoice/?delete=${invoice_id}`,
+        formData
       );
       getData();
       alert("Invoice deleted Successfully");
     } catch (err) {
       console.error("Error deleting client:", err);
     }
+  };
+
+  const handleChangeInvoiceMulti = (selectedOption) => {
+    setInvoiceItems(selectedOption);
+    console.log(invoiceItems, "ywiudddi");
+    setFormData({ ...formData, invoice_item_id: selectedOption.map((o) => o.value) });
   };
 
   const handleOpenModal = () => {
@@ -135,14 +153,6 @@ function Project(props) {
     setFormData({
       ...formData,
       client_id: +event.target.value,
-    });
-  };
-
-  const handleChangeStatus = (event) => {
-    const { target: { value } } = event;
-    setFormData({
-      ...formData,
-      status: typeof value === 'string' ? value.split(',') : value,
     });
   };
 
@@ -186,7 +196,7 @@ function Project(props) {
   };
 
   const handleDelete = (invoice_id) => {
-   deleteDataFromServer(invoice_id);
+    deleteDataFromServer(invoice_id);
     // const updatedData = [...tableData];
     // updatedData.splice(index, 1);
     // setTableData(updatedData);
@@ -194,6 +204,7 @@ function Project(props) {
 
   const handleInvoiceClick = (id) => {
     const invoice = tableData.find((item) => item.id === id);
+    console.log(invoice,'888888888');
     setInvoiceData(invoice);
     setIsInvoiceModalOpen(true);
   };
@@ -219,8 +230,8 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
-          invoiceData.invoice_number,
+          tableData.client_name,
+          invoiceData.client_name,
           invoiceData.order_number,
           invoiceData.invoice_date,
           invoiceData.due_date,
@@ -263,7 +274,7 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
+          invoiceData.client_name,
           invoiceData.invoice_number,
           invoiceData.order_number,
           invoiceData.invoice_date,
@@ -393,7 +404,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          {/* <FormControl sx={{ margin: 2 }}>
+          <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="invoice-number">status</InputLabel>
             <Input
               id="status"
@@ -401,27 +412,16 @@ function Project(props) {
               value={formData.status}
               onChange={handleChange}
             />
-          </FormControl> */}
-
-<FormControl sx={{ margin: 2,width: 200  }}>
-            <InputLabel>Status</InputLabel>
-            <Select
-              label="Status"
-              multiple
-              value={formData.status}
-              onChange={handleChangeStatus}
-              input={<Input label="Status" />}
-              renderValue={(selected) => selected.join(", ")}
-            >
-              {statusOptions.map((status) => (
-                <MenuItem key={status} value={status}>
-                  <Checkbox checked={formData.status.indexOf(status) > -1} />
-                  <ListItemText primary={status} />
-                </MenuItem>
-              ))}
-            </Select>
           </FormControl>
-
+          <ReactSelect
+            isMulti
+            isSearchable
+            value={invoiceItems}
+            // defaultValue={selectedOption}
+            placeholder="Enter Invoice Items"
+            onChange={handleChangeInvoiceMulti}
+            options={Option}
+          />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button variant="contained" color="success" onClick={handleSubmit}>
               {editMode ? "Update" : "Save"}
@@ -450,7 +450,10 @@ function Project(props) {
                 Amount
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-              Status
+                Status
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Invoice Items
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
@@ -482,7 +485,7 @@ function Project(props) {
                     {row.invoice_id}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.client_id?.client_name}
+                    {row.client_name}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.due_date}
@@ -491,7 +494,10 @@ function Project(props) {
                     {row.total_amount}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                  {row.status.join(", ")}
+                    {row.status}
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center" }}>
+                    {row.invoice_item_id}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     <IconButton
