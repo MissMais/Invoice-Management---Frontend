@@ -26,6 +26,7 @@ import axios from "axios";
 import base_url from "../utils/API";
 
 import Select from "@mui/material/Select";
+import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 
 function Project(props) {
@@ -34,6 +35,7 @@ function Project(props) {
     due_date: "",
     total_amount: "",
     status: "",
+    invoice_item_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -46,11 +48,32 @@ function Project(props) {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [client_id, setclient_id] = React.useState("");
+  const [invoiceItems, setInvoiceItems] = useState([]);
+  const [Option, setOption] = useState([]);
+
 
   useEffect(() => {
     getData();
     getclient();
+    getDataMultiInvoiceItems();
   }, []);
+
+  const getDataMultiInvoiceItems = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/invoice_item/`);
+      console.log(response.data,'invice');
+      setOption(
+        response.data.map((item_invoice) => ({
+          label: item_invoice.project_name,
+          value: item_invoice.invoice_item_id,
+        }))
+      );
+    } catch (err) {
+      console.log(err);
+      console.error("Error fetching data:", err);
+    }
+  };
+
 
   const getclient = async () => {
     try {
@@ -63,7 +86,7 @@ function Project(props) {
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/invoice/`);
-      console.log(response.data);
+      console.log(response.data,'table data');
       setTableData(response.data);
     } catch (err) {
       console.log(err);
@@ -83,6 +106,35 @@ function Project(props) {
         console.log(err);
       });
   }
+
+  const updateDataToServer = async (invoice_id) => {
+    try {
+      await axios.put(`${base_url}/client/invoice/`, formData);
+      getData();
+      alert("Invoice updated Successfully");
+    } catch (err) {
+      console.error("Error updating client:", err);
+    }
+  };
+
+  const deleteDataFromServer = async (invoice_id) => {
+    try {
+      await axios.delete(
+        `${base_url}/client/invoice/?delete=${invoice_id}`,
+        formData
+      );
+      getData();
+      alert("Invoice deleted Successfully");
+    } catch (err) {
+      console.error("Error deleting client:", err);
+    }
+  };
+
+  const handleChangeInvoiceMulti = (selectedOption) => {
+    setInvoiceItems(selectedOption);
+    console.log(invoiceItems, "ywiudddi");
+    setFormData({ ...formData, invoice_item_id: selectedOption.map((o) => o.value) });
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -114,6 +166,7 @@ function Project(props) {
 
   const handleSubmit = () => {
     if (editMode) {
+      updateDataToServer();
       const updatedData = [...tableData];
       updatedData[editIndex] = formData;
       setTableData(updatedData);
@@ -142,14 +195,16 @@ function Project(props) {
     }
   };
 
-  const handleDelete = (index) => {
-    const updatedData = [...tableData];
-    updatedData.splice(index, 1);
-    setTableData(updatedData);
+  const handleDelete = (invoice_id) => {
+    deleteDataFromServer(invoice_id);
+    // const updatedData = [...tableData];
+    // updatedData.splice(index, 1);
+    // setTableData(updatedData);
   };
 
   const handleInvoiceClick = (id) => {
     const invoice = tableData.find((item) => item.id === id);
+    console.log(invoice,'888888888');
     setInvoiceData(invoice);
     setIsInvoiceModalOpen(true);
   };
@@ -175,8 +230,8 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
-          invoiceData.invoice_number,
+          tableData.client_name,
+          invoiceData.client_name,
           invoiceData.order_number,
           invoiceData.invoice_date,
           invoiceData.due_date,
@@ -219,7 +274,7 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
+          invoiceData.client_name,
           invoiceData.invoice_number,
           invoiceData.order_number,
           invoiceData.invoice_date,
@@ -358,7 +413,15 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-
+          <ReactSelect
+            isMulti
+            isSearchable
+            value={invoiceItems}
+            // defaultValue={selectedOption}
+            placeholder="Enter Invoice Items"
+            onChange={handleChangeInvoiceMulti}
+            options={Option}
+          />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button variant="contained" color="success" onClick={handleSubmit}>
               {editMode ? "Update" : "Save"}
@@ -390,6 +453,9 @@ function Project(props) {
                 Status
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Invoice Items
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
               </TableCell>
             </TableRow>
@@ -419,7 +485,7 @@ function Project(props) {
                     {row.invoice_id}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.client_id?.client_name}
+                    {row.client_name}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.due_date}
@@ -431,6 +497,9 @@ function Project(props) {
                     {row.status}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
+                    {row.invoice_item_id}
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center" }}>
                     <IconButton
                       onClick={() => handleEdit(index)}
                       aria-label="edit"
@@ -439,7 +508,7 @@ function Project(props) {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(row.invoice_id)}
                       aria-label="delete"
                       sx={{ color: "red" }}
                     >

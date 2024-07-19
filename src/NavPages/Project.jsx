@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactSelect from "react-select";
 import {
   Input,
   Box,
@@ -15,7 +16,10 @@ import {
   FormControl,
   InputLabel,
   Modal,
+  List,
 } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import NavBar from "../NavBar";
@@ -27,7 +31,7 @@ function Project(props) {
     duration: "",
     client_id: "",
     team_id: "",
-    tech_id: "",
+    tech_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -35,11 +39,39 @@ function Project(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [Optionid, setOptionid] = useState([]);
+  const [tech_id, settech_id] = useState([]);
+  const [client, setclient] = useState([]);
+  const [client_id, setclient_id] = useState([]);
 
   useEffect(() => {
+    getclient();
     getData();
+    getDataMultiSelect();
   }, []);
 
+  const getDataMultiSelect = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/api/technology`);
+      // console.log(response.data, "#$%^##");
+      setOptionid(
+        response.data.map((tech) => ({
+          label: tech.name,
+          value: tech.tech_id,
+        }))
+      );
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  const getclient = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/client/`);
+      setclient(response.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/project/`);
@@ -83,6 +115,14 @@ function Project(props) {
     }
   };
 
+  const handleChangeClientIdDropdown = (event) => {
+    setclient_id(event.target.value);
+    setFormData({
+      ...formData,
+      client_id: +event.target.value,
+    });
+  };
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
     setEditMode(false);
@@ -101,6 +141,12 @@ function Project(props) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleChangeMultiSelect = (selectedOption) => {
+    settech_id(selectedOption);
+    console.log(tech_id, "ywiudddi");
+    setFormData({ ...formData, tech_id: selectedOption.map((o) => o.value) });
   };
 
   const handleSubmit = () => {
@@ -189,7 +235,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl sx={{ margin: 2 }}>
+          {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="client-id">Client Id</InputLabel>
             <Input
               id="client-id"
@@ -197,6 +243,21 @@ function Project(props) {
               value={formData.client_id}
               onChange={handleChange}
             />
+          </FormControl> */}
+          <FormControl sx={{ margin: 2, width: 200 }}>
+          <InputLabel id="demo-simple-select-label">Client Name</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={client_id}
+              variant="standard"
+              label="Client Name"
+              onChange={handleChangeClientIdDropdown}
+            >
+              {client.map((row, index) => (
+                <MenuItem value={row.client_id}>{row.client_name}</MenuItem>
+              ))}
+            </Select>
           </FormControl>
           <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="team-id">Team Id</InputLabel>
@@ -207,7 +268,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl sx={{ margin: 2 }}>
+          {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="tech-id">Tech Id</InputLabel>
             <Input
               id="tech-id"
@@ -215,7 +276,15 @@ function Project(props) {
               value={formData.tech_id}
               onChange={handleChange}
             />
-          </FormControl>
+          </FormControl> */}
+          <ReactSelect
+            isMulti
+            isSearchable
+            value={tech_id}
+            placeholder="Tech Id:Enter The Technology Name"
+            onChange={handleChangeMultiSelect}
+            options={Optionid}
+          />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button variant="contained" color="success" onClick={handleSubmit}>
               {editMode ? "Update" : "Save"}
@@ -269,13 +338,13 @@ function Project(props) {
                   {row.duration}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.client_id}
+                  {row.client_name}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.team_id}
+                  {row.team_name}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.tech_id}
+                  {row.tech_id.join(',')}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   <IconButton
