@@ -17,6 +17,7 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
+import Grid from '@mui/material/Grid';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import NavBar from "../NavBar";
@@ -29,10 +30,11 @@ import Select from "@mui/material/Select";
 import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 
+
 function Project(props) {
   const initialFormData = {
     client_id: "",
-    due_date: "",
+    generated_date: "",
     total_amount: "",
     status: "",
     invoice_item_id: [],
@@ -50,6 +52,7 @@ function Project(props) {
   const [client_id, setclient_id] = React.useState("");
   const [invoiceItems, setInvoiceItems] = useState([]);
   const [Option, setOption] = useState([]);
+  const [totalAmount, setTotalAmount] = useState([]);
 
 
   useEffect(() => {
@@ -66,6 +69,10 @@ function Project(props) {
         response.data.map((item_invoice) => ({
           label: item_invoice.project_name,
           value: item_invoice.invoice_item_id,
+          price : item_invoice.item_price,
+          tax_amount : item_invoice.tax_amount,
+          totalAmount : ((item_invoice.item_price + item_invoice.tax_amount ))
+
         }))
       );
     } catch (err) {
@@ -234,7 +241,7 @@ function Project(props) {
           invoiceData.client_name,
           invoiceData.order_number,
           invoiceData.invoice_date,
-          invoiceData.due_date,
+          invoiceData.generated_date,
         ],
       ],
     });
@@ -278,7 +285,7 @@ function Project(props) {
           invoiceData.invoice_number,
           invoiceData.order_number,
           invoiceData.invoice_date,
-          invoiceData.due_date,
+          invoiceData.generated_date,
         ],
       ],
     });
@@ -306,6 +313,7 @@ function Project(props) {
 
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
+      
       <NavBar />
 
       <Box
@@ -314,7 +322,7 @@ function Project(props) {
           justifyContent: "space-between",
           alignItems: "center",
         }}
-      >
+      > <Grid item xs={12} sm={6} md={4}>
         <TextField
           type="search"
           placeholder="Enter the Client Name"
@@ -329,7 +337,9 @@ function Project(props) {
               borderRadius: 16,
             },
           }}
-        />
+          />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
         <Button
           onClick={() => handleOpenModal()}
           size="medium"
@@ -341,9 +351,10 @@ function Project(props) {
             height: "40px",
             "&:hover": { color: "black", backgroundColor: "#53B789" },
           }}
-        >
+          >
           ADD
         </Button>
+        </Grid>
       </Box>
       <Modal
         open={isModalOpen}
@@ -386,12 +397,12 @@ function Project(props) {
           </FormControl>
 
           <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="due-date">Due Date</InputLabel>
+            {/* <InputLabel htmlFor="due-date">Due Date</InputLabel> */}
             <Input
-              // type='date'
+              type='date'
               id="due-date"
-              name="due_date"
-              value={formData.due_date}
+              name="generated_date"
+              value={formData.generated_date}
               onChange={handleChange}
             />
           </FormControl>
@@ -432,7 +443,6 @@ function Project(props) {
           </Box>
         </Box>
       </Modal>
-
       <TableContainer component={Paper} sx={{ marginTop: 5 }}>
         <Table>
           <TableHead sx={{ m: 5, backgroundColor: "#53B789" }}>
@@ -488,7 +498,7 @@ function Project(props) {
                     {row.client_name}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.due_date}
+                    {row.generated_date}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.total_amount}
@@ -556,7 +566,7 @@ function Project(props) {
                 Invoice Date: {invoiceData.invoice_date}
               </Typography>
               <Typography variant="body1">
-                Due Date: {invoiceData.due_date}
+                Due Date: {invoiceData.generated_date}
               </Typography>
               <Typography variant="body1">
                 Notes: {invoiceData.notes}
