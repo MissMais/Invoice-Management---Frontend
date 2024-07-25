@@ -25,13 +25,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import NavBar from "../NavBar";
 import axios from "axios";
 import base_url from "../utils/API";
+import { Start } from "@mui/icons-material";
 function Project(props) {
   const initialFormData = {
     project_name: "",
+    start_date: "",
     duration: "",
-    client_id: "",
-    team_id: "",
-    tech_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -217,12 +216,32 @@ function Project(props) {
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Project" : "Add Project"}
           </Typography>
+          {/* <FormControl sx={{ margin: 2 }}>
+            <InputLabel htmlFor="project-id">Project Id</InputLabel>
+            <Input
+              id="project-id"
+              name="project_id"
+              value={formData.project_id}
+              onChange={handleChange}
+            />
+          </FormControl> */}
           <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="project-id">Project Name</InputLabel>
             <Input
               id="project-name"
               name="project_name"
               value={formData.project_name}
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl sx={{ margin: 2,marginTop:-1 }}>
+            <label htmlFor="start_date">Start Date</label>
+            {/* <InputLabel htmlFor="duration">Start Date</InputLabel> */}
+            <Input
+              type="date"
+              id="start_date"
+              name="start_date"
+              value={formData.start_date}
               onChange={handleChange}
             />
           </FormControl>
@@ -244,7 +263,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl> */}
-          <FormControl sx={{ margin: 2, width: 200 }}>
+          {/* <FormControl sx={{ margin: 2, width: 200 }}>
           <InputLabel id="demo-simple-select-label">Client Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
@@ -267,7 +286,7 @@ function Project(props) {
               value={formData.team_id}
               onChange={handleChange}
             />
-          </FormControl>
+          </FormControl> */}
           {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="tech-id">Tech Id</InputLabel>
             <Input
@@ -277,14 +296,14 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl> */}
-          <ReactSelect
+          {/* <ReactSelect
             isMulti
             isSearchable
             value={tech_id}
             placeholder="Tech Id:Enter The Technology Name"
             onChange={handleChangeMultiSelect}
             options={Optionid}
-          />
+          /> */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button variant="contained" color="success" onClick={handleSubmit}>
               {editMode ? "Update" : "Save"}
@@ -301,20 +320,29 @@ function Project(props) {
           <TableHead sx={{ m: 5, backgroundColor: "#53B789" }}>
             <TableRow>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Project Id
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Project Name
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Start Date
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Duration
               </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
+              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Client Id
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
+              </TableCell> */}
+              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Team Id
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Tech Id
               </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Action
+              </TableCell> */}
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
               </TableCell>
@@ -332,20 +360,26 @@ function Project(props) {
                 }}
               >
                 <TableCell sx={{ textAlign: "center" }}>
+                  {row.project_id}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
                   {row.project_name}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {row.start_date}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {row.duration}
                 </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
+                {/* <TableCell sx={{ textAlign: "center" }}>
                   {row.client_name}
-                </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
+                </TableCell> */}
+                {/* <TableCell sx={{ textAlign: "center" }}>
                   {row.team_name}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {row.tech_id.join(',')}
-                </TableCell>
+                </TableCell> */}
                 <TableCell sx={{ textAlign: "center" }}>
                   <IconButton
                     onClick={() => handleEdit(index)}
