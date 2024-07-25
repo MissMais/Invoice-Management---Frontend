@@ -341,11 +341,11 @@ export default function NavBar() {
         sx={{
           "& .MuiPaper-root": {
             marginTop: 1,
-            marginLeft: -1,
-            color: "white",
+            marginLeft: 1,
+            color: "black",
             width: 220,
             height: "auto",
-            backgroundColor: "#123270",
+            // backgroundColor: "#123270",
             borderRadius: 2,
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
           },
@@ -362,9 +362,9 @@ export default function NavBar() {
           }}
           onClick={handleAddCompany}
         >
-          Add Company
+          Company Info
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           sx={{
             fontSize: "16px",
             padding: "10px 20px",
@@ -377,7 +377,7 @@ export default function NavBar() {
           onClick={handleViewCompany}
         >
           View Company
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
       <Modal
         open={modalOpen}

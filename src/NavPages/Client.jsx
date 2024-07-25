@@ -25,7 +25,7 @@ import base_url from "../utils/API";
 
 function Project(props) {
   const initialFormData = {
-    client_id: "",
+    
     client_name: "",
     address: "",
       email: "",
@@ -216,7 +216,7 @@ function Project(props) {
           <Typography id="modal-title" component="h2">
             {editMode ? "Edit Client" : "Add Client"}
           </Typography>
-          <FormControl sx={{ margin: 2 }}>
+          {/* <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="client-name">Client Id</InputLabel>
             <Input
               id="client-id"
@@ -224,7 +224,7 @@ function Project(props) {
               value={formData.client_id}
               onChange={handleChange}
             />
-          </FormControl>
+          </FormControl> */}
           <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="client-name">Client Name</InputLabel>
             <Input

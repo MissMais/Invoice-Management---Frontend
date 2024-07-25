@@ -297,7 +297,10 @@ function Project(props) {
             <TableRow>
               
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Project Id
+                Invoice_Item_Id
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Project Name
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Item Price
@@ -325,6 +328,9 @@ function Project(props) {
                 }}
               >
         
+                <TableCell sx={{ textAlign: "center" }}>
+                  {row.invoice_item_id}
+                </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {row.project_name}
                 </TableCell>

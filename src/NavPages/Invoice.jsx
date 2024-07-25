@@ -34,6 +34,7 @@ import MenuItem from "@mui/material/MenuItem";
 function Project(props) {
   const initialFormData = {
     client_id: "",
+    invoice_number: "",
     generated_date: "",
     total_amount: "",
     status: "",
@@ -380,6 +381,15 @@ function Project(props) {
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Invoice" : "Add Invoice"}
           </Typography>
+          <FormControl sx={{ margin: 2 }}>
+            <InputLabel htmlFor="invoice-number">Invoice Number</InputLabel>
+            <Input
+              id="invoice-number"
+              name="invoice_number"
+              value={formData.invoice_number}
+              onChange={handleChange}
+            />
+          </FormControl>
           <FormControl sx={{ margin: 2, width: 200 }}>
             <InputLabel id="demo-simple-select-label">Client Name</InputLabel>
             <Select
@@ -396,14 +406,21 @@ function Project(props) {
             </Select>
           </FormControl>
 
-          <FormControl sx={{ margin: 2 }}>
+          <FormControl sx={{ margin: 2,marginTop:-1 }}>
             {/* <InputLabel htmlFor="due-date">Due Date</InputLabel> */}
+            <label htmlFor="due-date">Due Date</label>
             <Input
               type='date'
               id="due-date"
               name="generated_date"
               value={formData.generated_date}
               onChange={handleChange}
+              // // required:true,
+              // // pattern:{
+              // //   value:/^\+91\d{10}$/,
+
+              // }
+              
             />
           </FormControl>
           <FormControl sx={{ margin: 2 }}>
@@ -451,6 +468,9 @@ function Project(props) {
                 ID
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Invoice Number
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Client Name
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -493,6 +513,9 @@ function Project(props) {
                     onClick={() => handleInvoiceClick(row.id)}
                   >
                     {row.invoice_id}
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center" }}>
+                    {row.invoice_number}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.client_name}
