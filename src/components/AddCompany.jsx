@@ -1,28 +1,9 @@
-// import { Box } from '@mui/material'
-// import React from 'react'
-// import NavBar from '../NavBar'
-
-// const AddCompany = () => {
-//   return (
-//     <div>
-//         <Box sx={{ display: "flex", p: 10 }}>
-//         <NavBar />
-//         <Box component="main" sx={{ flexGrow: 1 }}>
-//                 <h1>Add Company Form Here</h1>
-//         </Box>
-//         </Box>
-//     </div>
-//   )
-// }
-
-// export default AddCompany
-
-
 import { Box } from '@mui/material'
 import React, { useState, useEffect } from 'react'
 import NavBar from '../NavBar'
-import { useForm } from "react-hook-form";
 import {
+    Grid,
+    Modal,
     Input,
     Button,
     Typography,
@@ -35,455 +16,429 @@ import base_url from '../utils/API';
 
 
 export default function AddCompany() {
-    const [data, setData] = useState(null)
-    const [adding, setAdding] = useState(false)
+    const [data, setData] = useState({
+        "company_details_id": "",
+        "company_name": "",
+        "company_address": "",
+        "pincode": "",
+        "bank_name": "",
+        "branch_name": "",
+        "account_number": "",
+        "ifsc_code": "",
+        "gst_in": "",
+        "user_id": ""
+
+    })
+    const [images, setImages] = useState({
+        "company_logo": null,
+        "digital_seal": null,
+        "digital_signature": null,
+    })
+    const [dataImage, setDataImage] = useState({
+        "company_logo": "",
+        "digital_seal": "",
+        "digital_signature": "",
+    })
     const [edit, setEdit] = useState(null)
-    const { register, handleSubmit, reset } = useForm();
-    const [logoPreview, setLogoPreview] = useState(null)
-    const [sealPreview, setSealPreview] = useState(null)
-    const [signaturePreview, setSignaturePreview] = useState(null)
+    const [open, setOpen] = useState(false)
 
-
+    const handleAdd = () => {
+        setOpen(true)
+        setEdit(null)
+        setData({})
+    }
     useEffect(() => {
-        fetchData();
-        if (edit) {
-            reset({
-                company_logo: "",
-                company_name: edit.company_name || "",
-                company_address: edit.company_address || "",
-                pincode: edit.pincode || "",
-                bank_name: edit.bank_name || "",
-                branch_name: edit.branch_name || "",
-                account_number: edit.account_number || "",
-                ifsc_code: edit.ifsc_code || "",
-                gst_in: edit.gst_in || "",
-                digital_seal: "",
-                digital_signature: "",
-                user_id: edit.user_id || "",
-            })
-            setLogoPreview(edit.company_logo || "");
-            setSealPreview(edit.digital_seal || "");
-            setSignaturePreview(edit.digital_signature || "")
-        }
-    }, [reset, edit])
+        fetchData()
+    }, [])
 
     const fetchData = () => {
         axios.get(`${base_url}/client/company_details/`)
-            .then(response => {
-              console.log(response.data,'36894689')
-                if (response.data && response.data.length > 0) {
-                    setData(response.data)
+            .then((response) => {
+                console.log(response.data);
+                if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                    setData(response.data);
+                    const imageData = response.data[0];
+                    setDataImage({
+                        company_logo: imageData.company_logo || "",
+                        digital_seal: imageData.digital_seal || "",
+                        digital_signature: imageData.digital_signature || "",
+                    });
+                } else {
+                    setData([]);
+                    setDataImage({
+                        company_logo: "",
+                        digital_seal: "",
+                        digital_signature: "",
+                    });
                 }
-            })
-            .catch(error => {
+            }).catch((error) => {
                 console.log("error fetching data", error);
-            })
-    }
-
-    const handleEdit = (companyData) => {
-        setEdit(companyData)
-        setAdding(true)
-    }
-    const handleDelete = (company_details_id) => {
-        axios
-            .delete(`${base_url}/client/company_details/?delete=${company_details_id}`)
-            .then(() => {
-                fetchData();
-            })
-            .catch((error) => {
-                console.error("Error", error);
             });
+    };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData(prevData => ({
+            ...prevData,
+            [name]: value,
+        }))
     }
-
-    const handleAdd = () => {
-        setAdding(true)
-        setEdit(null)
-    }
-
-    const handleImageChange = (e, setImagePreview) => {
-        const file = e.target.files[0]
-        if (file) {
-            setImagePreview(URL.createObjectURL(file))
+    const handleImageChange = (e) => {
+        const { name, files } = e.target;
+        if (files[0]) {
+            setImages(prevImages => ({
+                ...prevImages,
+                [name]: files[0]
+            }))
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setDataImage(prevData => ({
+                    ...prevData,
+                    [name]: reader.result
+                }))
+            }
+            reader.readAsDataURL(files[0])
         }
     }
-
-    const handleFormSubmit = (data) => {
-        addData(data, edit !== null);
-        reset()
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        addData(data, edit)
     }
-
-    function addData(data, isEditing) {
-        const formData = new FormData()
-        // formData.append('company_logo', data.company_logo[0]);
-        formData.append('company_address', data.company_address);
-        formData.append('company_name', data.company_name);
-        formData.append('user_id', data.user_id);
-        formData.append('pincode', data.pincode);
-        formData.append('bank_name', data.bank_name);
-        formData.append('branch_name', data.branch_name);
-        formData.append('account_number', data.account_number);
-        formData.append('ifsc_code', data.ifsc_code);
-        formData.append('gst_in', data.gst_in);
-        // formData.append('digital_seal', data.digital_seal[0]);
-        // formData.append('digital_signature', data.digital_signature[0])
-
-        const url = isEditing
-            ? `${base_url}/client/company_details/?company_d_upd=${edit.company_details_id}`
-            : `${base_url}/client/company_details/`;
-
-        const method = isEditing ? axios.patch : axios.post;
-
-        method(url, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
+    function addData(data, editable) {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+        for (const key in images) {
+            if (images[key]) {
+                formData.append(key, images[key]);
             }
-        })
-            .then((response) => {
-                setData(response.data)
-                setAdding(false)
-                setEdit(null)
-                fetchData();
+        }
+        if (editable) {
+            axios.patch(`${base_url}/client/company_details/?company_d_upd=${edit.company_details_id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then((response) => {
+                fetchData()
+                setOpen(false)
+            }).catch((error) => {
+                console.log("error editing data", error);
             })
-            .catch((error) => {
-                console.log("error submitting data", error);
+        }
+        else {
+            axios.post(`${base_url}/client/company_details/`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then((response) => {
+                fetchData()
+                setOpen(false)
+            })
+                .then((error) => {
+                    console.log("error adding data", error);
+                })
+        }
+    }
+    const handleEdit = (item) => {
+        setEdit(item);
+        setData(item);
+        setDataImage({
+            company_logo: item.company_logo || "",
+            digital_seal: item.digital_seal || "",
+            digital_signature: item.digital_signature || "",
+        });
+        setOpen(true);
+    }
+    const handleDelete = (company_details_id) => {
+        axios.delete(`${base_url}/client/company_details/?delete=${company_details_id}`)
+            .then((response) => {
+                fetchData()
+                // setData(data => data.filter((e) => e.company_details_id !== company_details_id))
+                setData(prevData => prevData.filter((e) => e.company_details_id !== company_details_id))
+            }).catch((error) => {
+                console.log("error deleting data", error);
             })
     }
 
     return (
-        <div>
-            <Box sx={{ display: "flex", p: 10 }}>
-                <NavBar />
-                <Box component="main" sx={{ flexGrow: 1 }}>
-                    {data ? (data.map((e, index) => (
-                        <Box
-                            key={index}
-                            sx={{
-                                maxWidth: "100%",
-                                padding: '20px',
-                                margin: '10px',
-                                '@media (max-width:600px)': {
-                                    padding: '10px',
-                                    margin: '5px',
-                                },
-                            }}
-                        >
-                            <Button variant="contained" onClick={handleEdit(e)}>Edit</Button>
-                            <Button variant="contained" onClick={handleDelete(e.company_details_id)}>Delete</Button>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                    margin: '10px',
-                                    padding: '10px',
-                                    '@media (max-width:600px)': {
-                                        flexDirection: 'column',
-                                        margin: '5px',
-                                        padding: '5px',
-                                    },
-                                }}
-                            >
+        <>
+            <div>
+                <Box sx={{ display: "flex", p: 10 }}>
+                    <NavBar />
+                    <Box component="main" sx={{ flexGrow: 1 }}>
+                        {data.length > 0 ? (
+                            data.map((e, index) => (
                                 <Box
+                                    key={index}
                                     sx={{
-                                        margin: '10px',
-                                        '& img': {
-                                            height: '25vh',
-                                            width: '20vw',
-                                            '@media (max-width:600px)': {
-                                                height: '20vh',
-                                                width: '80vw',
-                                            },
-                                        },
-                                    }}
-                                >
-                                    <img src={e.company_logo} alt="logo" />
-                                </Box>
-                                <Box
-                                    sx={{
-                                        margin: '10px',
-                                        textAlign: 'center',
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        padding: "10px"
-                                    }}
-                                >
-                                    <Typography variant="h4">{e.company_name}</Typography>
-                                </Box>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                    margin: '10px',
-                                    padding: '10px',
-                                    '@media (max-width:600px)': {
-                                        flexDirection: 'column',
-                                        margin: '5px',
-                                        padding: '5px',
-                                    },
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        height: '30vh',
-                                        width: '20vw',
-                                        margin: '10px',
+                                        maxWidth: "100%",
                                         padding: '20px',
-                                        flexDirection: "column",
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        '@media (max-width:600px)': {
-                                            width: '80vw',
-                                            height: 'auto',
-                                            padding: '10px',
-                                        },
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ textAlign: 'left' }}>Address: {e.company_address}</Typography>
-                                    <Typography variant="h6">Pincode: {e.pincode}</Typography>
-                                </Box>
-                                <Box
-                                    sx={{
-                                        height: '30vh',
-                                        width: '20vw',
                                         margin: '10px',
-                                        padding: '20px',
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: 'center',
-                                        alignItems: 'left',
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                         '@media (max-width:600px)': {
-                                            width: '80vw',
-                                            height: 'auto',
-                                            padding: '10px',
+                                            padding: '15px',
+                                            margin: '5px',
                                         },
                                     }}
                                 >
-                                    <Typography variant="h6">Bank : {e.bank_name}</Typography>
-                                    <Typography variant="h6">Branch : {e.branch_name}</Typography>
-                                    <Typography variant="h6">Account Number : {e.account_number}</Typography>
-                                    <Typography variant="h6">IFSC Code : {e.ifsc_code}</Typography>
-                                    <Typography variant="h6">GST IN : {e.gst_in}</Typography>
-                                </Box>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                    margin: '10px',
-                                    padding: '10px',
-                                    '@media (max-width:600px)': {
-                                        flexDirection: 'column',
-                                        margin: '5px',
-                                        padding: '5px',
-                                    },
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        margin: '10px',
-                                        '& img': {
-                                            height: '20vh',
-                                            width: '20vw',
-                                            borderRadius: '8px',
-                                            '@media (max-width:600px)': {
-                                                height: '15vh',
-                                                width: '80vw',
-                                            },
-                                        },
-                                    }}
-                                >
-                                    <Typography variant="h6">Digital Seal :</Typography>
-                                    <img src={e.digital_seal} alt="seal" />
-                                </Box>
-                                <Box
-                                    sx={{
-                                        height: '20vh',
-                                        width: '20vw',
-                                        margin: '10px',
-                                        '@media (max-width:600px)': {
-                                            width: '80vw',
-                                            height: 'auto',
-                                        },
-                                    }}
-                                >
-                                    <Typography variant="h6">Digital Signature : </Typography>
-                                    <img
-                                        src={e.digital_signature}
-                                        alt="signature"
-                                        style={{
-                                            height: '20vh',
-                                            width: '20vw',
-                                            '@media (max-width:600px)': {
-                                                height: '15vh',
-                                                width: '80vw',
-                                            },
-                                        }}
-                                    />
-                                </Box>
-                            </Box>
-                        </Box>
-
-                    ))
-                    ) : (adding || edit ? (
-                        <Box sx={{ display: 'block' }} component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-                            <Stack spacing={2} direction='row'>
-                                <Input
-                                    type="text"
-                                    id="user_id"
-                                    name="user_id"
-                                    placeholder="Enter User ID"
-                                    {...register("user_id")}
-                                    variant="standard"
-                                />
-                                <Input
-                                    type="text"
-                                    id="company_name"
-                                    name="company_name"
-                                    placeholder="Enter Company Name"
-                                    {...register("company_name")}
-                                    variant="standard"
-                                />
-                            </Stack>
-                            <FormControl margin="normal">
-                                <Typography marginBottom={2}>Add Company Logo</Typography>
-                                <Input
-                                    type="file"
-                                    id="logo"
-                                    name="logo"
-                                    placeholder="Insert Logo"
-                                    {...register("logo")}
-                                    onChange={(e) => handleImageChange(e, setLogoPreview)}
-                                    variant="standard"
-                                />
-                                {logoPreview && (
-                                    <Box mt={2} textAlign="center">
-                                        <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: '100%', maxHeight: 150 }} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                                        <Button variant="outlined" onClick={() => handleEdit(e)} sx={{ marginRight: '10px' }}>Edit</Button>
+                                        <Button variant="outlined" color="error" onClick={() => handleDelete(e.company_details_id)}>Delete</Button>
                                     </Box>
-                                )}
-                            </FormControl>
-                            <Typography>Company Address</Typography>
-                            <Stack spacing={4} direction='row' marginBottom={2}>
-                                <TextField
-                                    type="text"
-                                    id="Address"
-                                    name="Address"
-                                    placeholder="Company Address"
-                                    multiline
-                                    maxRows={4}
-                                    variant="standard"
-                                    {...register("Address")}
-                                />
-                                <Input
-                                    type="text"
-                                    id="pincode"
-                                    name="pincode"
-                                    placeholder="Pincode"
-                                    {...register("pincode")}
-                                />
-                            </Stack>
-                            <Typography>Bank Details</Typography>
-                            <Stack spacing={2} direction='row' marginBottom={2}>
-                                <Input
-                                    type="text"
-                                    id="bankname"
-                                    name="bankname"
-                                    placeholder="Bank Name"
-                                    {...register("bankname")}
-                                />
-                                <Input
-                                    type="text"
-                                    id="branch_name"
-                                    name="branch_name"
-                                    placeholder="Branch Name"
-                                    {...register("branch_name")}
-                                />
-                            </Stack>
-                            <Stack spacing={4} direction='row' marginBottom={2}>
-                                <Input
-                                    type="text"
-                                    id="accountnumber"
-                                    name="accountnumber"
-                                    placeholder="Account Number"
-                                    {...register("accountnumber")}
-                                />
-                                <Input
-                                    type="text"
-                                    id="ifsc"
-                                    name="ifsc"
-                                    placeholder="IFSC Code"
-                                    {...register("ifsc")}
-                                />
-                                <Input
-                                    type="text"
-                                    id="gst_in"
-                                    name="gst_in"
-                                    placeholder="GST"
-                                    {...register("gst_in")}
-                                />
-                            </Stack>
-                            <Stack spacing={4} direction='row'>
-                                <FormControl margin="normal">
-                                    <Typography marginBottom={2}>Add Company Seal</Typography>
-                                    <Input
-                                        type="file"
-                                        id="seal"
-                                        name="seal"
-                                        {...register("seal")}
-                                        onChange={(e) => handleImageChange(e, setSealPreview)}
-                                    />
-                                    {sealPreview && (
-                                        <Box mt={2} textAlign="center">
-                                            <img src={sealPreview} alt="Seal Preview" style={{ maxWidth: '100%', maxHeight: 150 }} />
-                                        </Box>
-                                    )}
-                                </FormControl>
-                                <FormControl margin="normal">
-                                    <Typography marginBottom={2}>Add Company Digital Signature</Typography>
-                                    <Input
-                                        type="file"
-                                        id="signature"
-                                        name="signature"
-                                        {...register("signature")}
-                                        onChange={(e) => handleImageChange(e, setSignaturePreview)}
-                                    />
-                                    {signaturePreview && (
-                                        <Box mt={2} textAlign="center">
-                                            <img src={signaturePreview} alt="Signature Preview" style={{ maxWidth: '100%', maxHeight: 150 }} />
-                                        </Box>
-                                    )}
-                                </FormControl>
-                            </Stack>
-                            <Stack spacing={60} direction='row' marginTop={2}>
-                                <Button type="submit" variant="contained" color="success">
-                                    Submit
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    onClick={() => {
-                                        setAdding(false);
-                                        setEdit(null);
-                                        reset();
+
+                                    <Grid sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        flexDirection: 'row',
+                                        marginBottom: '20px',
+                                        '@media (max-width:600px)': {
+                                            flexDirection: 'column',
+                                        },
+                                    }} container spacing={3}>
+                                        <Grid item xs={12} md={6}>
+
+                                            <Box
+                                                sx={{
+                                                    '& img': {
+                                                        height: '120px',
+                                                        width: 'auto',
+                                                        maxWidth: '100%',
+                                                        objectFit: 'contain',
+                                                    },
+                                                }}
+                                            >
+
+                                                <img src={e.company_logo} alt="Company Logo" />
+                                            </Box>
+                                        </Grid>
+
+                                        {/* </Box> */}
+                                        <Grid item xs={12} md={6}>
+
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', marginLeft: '20px' }}>{e.company_name}</Typography>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Grid container spacing={3}>
+                                        <Grid item xs={12} md={6}>
+                                            <Typography variant="h6" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>Company Details</Typography>
+                                            <Typography><strong>Address:</strong> {e.company_address}</Typography>
+                                            <Typography><strong>Pincode:</strong> {e.pincode}</Typography>
+                                            <Typography><strong>GST IN:</strong> {e.gst_in}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                            <Typography variant="h6" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>Bank Details</Typography>
+                                            <Typography><strong>Bank:</strong> {e.bank_name}</Typography>
+                                            <Typography><strong>Branch:</strong> {e.branch_name}</Typography>
+                                            <Typography><strong>Account Number:</strong> {e.account_number}</Typography>
+                                            <Typography><strong>IFSC Code:</strong> {e.ifsc_code}</Typography>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Box sx={{ marginTop: '20px' }}>
+
+                                        <Grid container spacing={3}>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="h6" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>Digital Seal</Typography>
+                                                <img
+                                                    src={e.digital_seal}
+                                                    alt="Digital seal"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        height: 'auto',
+                                                        maxHeight: '150px',
+                                                        objectFit: 'contain',
+                                                        border: '1px solid #e0e0e0',
+                                                        borderRadius: '4px',
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="h6" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>Digital Signature</Typography>
+                                                <img
+                                                    src={e.digital_signature}
+                                                    alt="Digital signature"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        height: 'auto',
+                                                        maxHeight: '150px',
+                                                        objectFit: 'contain',
+                                                        border: '1px solid #e0e0e0',
+                                                        borderRadius: '4px',
+                                                    }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+                                </Box>
+                            ))
+                        ) : (
+                            <Button variant="outlined" onClick={handleAdd}>Add</Button>
+                        )} {
+                            (open || edit) && (
+                                <Modal
+                                    open={open}
+                                    onClose={() => setOpen(false)}>
+
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '80%',
+                                        maxWidth: 800,
+                                        bgcolor: 'background.paper',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: 2,
+                                        maxHeight: '90vh',
+                                        overflowY: 'auto',
                                     }}
-                                >
-                                    Cancel
-                                </Button>
-                            </Stack>
-                        </Box>
-                    ) : (
-                        <Button variant="contained" onClick={handleAdd}>Add</Button>
-                    ))}
+                                        component="form" onSubmit={handleFormSubmit}
+                                    >
+                                        <Stack spacing={2} direction='row'>
+                                            <Input
+                                                type="text"
+                                                id="user_id"
+                                                name="user_id"
+                                                placeholder="Enter User ID"
+                                                value={data.user_id}
+                                                variant="standard"
+                                                onChange={handleChange}
+                                            />
+                                            <Input
+                                                type="text"
+                                                id="company_name"
+                                                name="company_name"
+                                                placeholder="Enter Company Name"
+                                                variant="standard"
+                                                value={data.company_name}
+                                                onChange={handleChange}
+                                            />
+                                        </Stack>
+                                        <FormControl margin="normal">
+                                            <Typography marginBottom={2}>Add Company Logo</Typography>
+                                            <Input
+                                                type="file"
+                                                id="company_logo"
+                                                name="company_logo"
+                                                placeholder="Insert Logo"
+                                                onChange={handleImageChange}
+                                            />
+                                            {dataImage.company_logo && (
+                                                <img src={dataImage.company_logo} alt="Company Logo" style={{ maxWidth: '200px' }} />
+                                            )}
+                                        </FormControl>
+                                        <Typography>Company Address</Typography>
+                                        <Stack spacing={4} direction='row' marginBottom={2}>
+                                            <TextField
+                                                type="text"
+                                                id="company_address"
+                                                name="company_address"
+                                                placeholder="Company Address"
+                                                multiline
+                                                maxRows={4}
+                                                variant="standard"
+                                                value={data.company_address}
+                                                onChange={handleChange}
+                                            />
+                                            <Input
+                                                type="text"
+                                                id="pincode" 
+                                                name="pincode"
+                                                placeholder="Pincode"
+                                                value={data.pincode}
+                                                onChange={handleChange}
+                                            />
+                                        </Stack>
+                                        <Typography>Bank Details</Typography>
+                                        <Stack spacing={2} direction='row' marginBottom={2}>
+                                            <Input
+                                                type="text"
+                                                id="bank_name"
+                                                name="bank_name"
+                                                placeholder="Bank Name"
+                                                value={data.bank_name}
+                                                onChange={handleChange}
+                                            />
+                                            <Input
+                                                type="text"
+                                                id="branch_name"
+                                                name="branch_name"
+                                                placeholder="Branch Name"
+                                                value={data.branch_name}
+                                                onChange={handleChange}
+                                            />
+                                        </Stack>
+                                        <Stack spacing={4} direction='row' marginBottom={2}>
+                                            <Input
+                                                type="text"
+                                                id="account_number"
+                                                name="account_number"
+                                                placeholder="Account Number"
+                                                value={data.account_number}
+                                                onChange={handleChange}
+                                            />
+                                            <Input
+                                                type="text"
+                                                id="ifsc_code"
+                                                name="ifsc_code"
+                                                placeholder="IFSC Code"
+                                                value={data.ifsc_code}
+                                                onChange={handleChange}
+                                            />
+                                            <Input
+                                                type="text"
+                                                id="gst_in"
+                                                name="gst_in"
+                                                placeholder="GST"
+                                                value={data.gst_in}
+                                                onChange={handleChange}
+                                            />
+                                        </Stack>
+                                        <Stack spacing={4} direction='row'>
+                                            <FormControl margin="normal">
+                                                <Typography marginBottom={2}>Digital Seal</Typography>
+                                                <Input
+                                                    type="file"
+                                                    id="digital_seal"
+                                                    name="digital_seal"
+                                                    onChange={handleImageChange}
+                                                />
+                                                {dataImage.digital_seal && (
+                                                    <img src={dataImage.digital_seal} alt="Digital Seal" style={{ maxWidth: '200px' }} />
+                                                )}
+                                            </FormControl>
+                                            <FormControl margin="normal">
+                                                <Typography marginBottom={2}>Digital Signature</Typography>
+                                                <Input
+                                                    type="file"
+                                                    id="digital_signature"
+                                                    name="digital_signature"
+                                                    onChange={handleImageChange}
+                                                />
+                                                {dataImage.digital_signature && (
+                                                    <img src={dataImage.digital_signature} alt="Digital Seal" style={{ maxWidth: '200px' }} />
+                                                )}
+                                            </FormControl>
+                                        </Stack>
+                                        <Stack spacing={60} direction='row' marginTop={2}>
+                                            <Button variant="outlined" color="success" type='submit'>
+                                                {edit ? 'Update' : 'Save'}
+                                            </Button>
+                                            <Button variant="outlined" color="error" onClick={() => setOpen(false)}>
+                                                Cancel
+                                            </Button>
+                                        </Stack>
+                                    </Box>
+                                </Modal>
+                            )}
+                    </Box>
                 </Box>
-            </Box>
-        </div>
+            </div>
+        </>
     )
 }
