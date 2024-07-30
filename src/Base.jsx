@@ -12,7 +12,6 @@ import Tax from './NavPages/Tax';
 import PaymentMethod from './NavPages/PaymentMethod';
 import ProtectedRoutes from './ProtectedRoutes';
 import AddCompany from './components/AddCompany';
-import ViewCompany from './components/ViewCompany';
 
 
 function Base(props) {
@@ -24,7 +23,6 @@ function Base(props) {
       <Route path='/Sales' element={<ProtectedRoutes><Sales/></ProtectedRoutes>} />
       <Route path='/Purchase' element={<ProtectedRoutes><Purchase/></ProtectedRoutes>} />
       <Route path='/AddCompany' element={<ProtectedRoutes><AddCompany/></ProtectedRoutes>} />
-      <Route path='/ViewCompany' element={<ProtectedRoutes><ViewCompany/></ProtectedRoutes>} />
       <Route path='/Invoice' element={<ProtectedRoutes><Invoice/></ProtectedRoutes>} />
       <Route path='/Client' element={<ProtectedRoutes><Client/></ProtectedRoutes>} />
       <Route path='/InvoiceItem' element={<ProtectedRoutes><InvoiceItem/></ProtectedRoutes>} />

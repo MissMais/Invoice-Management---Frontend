@@ -218,6 +218,9 @@ export default function NavBar() {
               display: "block",
               backgroundColor:
                 location.pathname === routeNames.HOME ? "#53B789" : "initial",
+                
+              color:
+              location.pathname === routeNames.HOME ? "white" : "initial",
             }}
             onClick={() => navigate("/")}
           >
@@ -233,6 +236,9 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  
+                  color:
+                  location.pathname === routeNames.HOME ? "white" : "initial",
                 }}
               >
                 <HomeIcon />
@@ -249,6 +255,9 @@ export default function NavBar() {
                 location.pathname === routeNames.INVOICE
                   ? "#53B789"
                   : "initial",
+                  
+              color:
+              location.pathname === routeNames.INVOICE ? "white" : "initial",
             }}
             onClick={() => navigate("/Invoice")}
           >
@@ -264,6 +273,8 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  color:
+                  location.pathname === routeNames.INVOICE ? "white" : "initial",
                 }}
               >
                 <ReceiptIcon />
@@ -277,6 +288,8 @@ export default function NavBar() {
               display: "block",
               backgroundColor:
                 location.pathname === routeNames.CLIENT ? "#53B789" : "initial",
+              color:
+                location.pathname === routeNames.CLIENT ? "white" : "initial",
             }}
             onClick={() => navigate("/Client")}
           >
@@ -292,6 +305,8 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  color:
+                  location.pathname === routeNames.CLIENT ? "white" : "initial",
                 }}
               >
                 <GroupIcon />
@@ -357,6 +372,7 @@ export default function NavBar() {
             padding: "10px 20px",
             paddingLeft: "50px",
             "&:hover": {
+              color: "white",
               backgroundColor: "#53B789",
             },
           }}
@@ -536,3 +552,4 @@ export default function NavBar() {
     </Box>
   );
 }
+

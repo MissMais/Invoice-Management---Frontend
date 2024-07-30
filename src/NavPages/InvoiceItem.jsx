@@ -275,6 +275,7 @@ function Project(props) {
               name="tax_amount"
               value={formData.tax_amount}
               onChange={handleChange}
+              disabled
             />
           </FormControl>
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
