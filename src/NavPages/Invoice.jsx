@@ -626,8 +626,8 @@ function Project(props) {
                   </TableCell> */}
                   <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
                     <Button variant="standard"
-                      sx={{ textTransform: 'none', "&:hover": { color: "black", backgroundColor: "#53B789" }, }}
-                      onClick={() => handleInvoiceClick(row.id)}>
+                    sx={{textTransform: 'none',"&:hover": { color: "black", backgroundColor: "#53B789" }, }}
+                    onClick={() => handleInvoiceClick(row.id)}>
                       View Invoice
                     </Button>
                   </TableCell>
