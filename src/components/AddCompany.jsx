@@ -140,6 +140,7 @@ export default function AddCompany() {
         }
     }
     const handleEdit = (item) => {
+        fetchData()
         setEdit(item);
         setData(item);
         setDataImage({
