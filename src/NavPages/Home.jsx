@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Plot from "react-plotly.js";
 import axios from "axios";
 import base_url from "../utils/API";
+import PieChart from "../components/PieChart";
 
 function Home(props) {
   const [tableData, setTableData] = useState([]);
@@ -47,7 +48,7 @@ function Home(props) {
             }}
           />
 
-          <Plot
+          {/* <Plot
             data={[
               {
                 labels: tableData.tech_count_name,
@@ -61,7 +62,10 @@ function Home(props) {
               height: 500,
               margin: { l: 50, r: 50, b: 100, t: 120 },
             }}
-          />
+          /> */}
+          <Box sx={{marginTop:5}}>
+          <PieChart/>
+          </Box>
         </Box>
       </Box>
     </div>

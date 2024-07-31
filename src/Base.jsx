@@ -10,10 +10,8 @@ import Payment from './NavPages/Payment';
 import Project from './NavPages/Project';
 import Tax from './NavPages/Tax';
 import PaymentMethod from './NavPages/PaymentMethod';
-import Employee from './NavPages/Employee';
-import Technology from './NavPages/Technology';
-import TechnologyOption from './NavPages/TechnologyOption';
 import ProtectedRoutes from './ProtectedRoutes';
+import AddCompany from './components/AddCompany';
 
 
 function Base(props) {
@@ -24,17 +22,15 @@ function Base(props) {
       <Route path='/*' element={<Home/>} />
       <Route path='/Sales' element={<ProtectedRoutes><Sales/></ProtectedRoutes>} />
       <Route path='/Purchase' element={<ProtectedRoutes><Purchase/></ProtectedRoutes>} />
+      <Route path='/AddCompany' element={<ProtectedRoutes><AddCompany/></ProtectedRoutes>} />
       <Route path='/Invoice' element={<ProtectedRoutes><Invoice/></ProtectedRoutes>} />
       <Route path='/Client' element={<ProtectedRoutes><Client/></ProtectedRoutes>} />
       <Route path='/InvoiceItem' element={<ProtectedRoutes><InvoiceItem/></ProtectedRoutes>} />
       <Route path='/Payment/*' element={<ProtectedRoutes><Payment/></ProtectedRoutes>}/>
       <Route path='/Project' element={<ProtectedRoutes><Project/></ProtectedRoutes>}/>
-      <Route path='/Technology' element={<ProtectedRoutes><Technology/></ProtectedRoutes>}/>
-      <Route path='/TechnologyOption' element={<ProtectedRoutes><TechnologyOption/></ProtectedRoutes>}/>
       <Route path='/Tax' element={<ProtectedRoutes><Tax/></ProtectedRoutes>}/>
       <Route path='/Payment/*' element={<ProtectedRoutes><Payment/></ProtectedRoutes>}/>
       <Route path='/PayMethod/*' element={<ProtectedRoutes><PaymentMethod/></ProtectedRoutes>}/>
-      <Route path='/Employee/*' element={<ProtectedRoutes><Employee/></ProtectedRoutes>}/>
     </Routes>
     </main>
   );
@@ -46,7 +42,7 @@ export const routeNames = {
   HOME: '/',
   INVOICE: '/Invoice',
   CLIENT: '/Client',
-  PROJECT: '/Project',
+  PROFILE: '/Profile',
 }
 
 
