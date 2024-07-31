@@ -25,16 +25,13 @@ import base_url from "../utils/API";
 
 function Project(props) {
   const initialFormData = {
+    
     client_name: "",
-    company_address: "",
-    user_id: {
-      first_name: "",
-      last_name: "",
-      user_name: "",
+    address: "",
       email: "",
       contact: "",
-      password: "",
-    },
+      pincode: "",
+    
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -219,6 +216,15 @@ function Project(props) {
           <Typography id="modal-title" component="h2">
             {editMode ? "Edit Client" : "Add Client"}
           </Typography>
+          {/* <FormControl sx={{ margin: 2 }}>
+            <InputLabel htmlFor="client-name">Client Id</InputLabel>
+            <Input
+              id="client-id"
+              name="client_id"
+              value={formData.client_id}
+              onChange={handleChange}
+            />
+          </FormControl> */}
           <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="client-name">Client Name</InputLabel>
             <Input
@@ -228,69 +234,43 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
+          
           <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="user_id.user_name">User Name</InputLabel>
+            <InputLabel htmlFor="email">Email</InputLabel>
             <Input
-              id="user_id.user_name"
-              name="user_id.user_name"
-              value={formData.user_id.user_name}
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
             />
           </FormControl>
           <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="user_id.first_name">First Name</InputLabel>
+            <InputLabel htmlFor="contact">Contact</InputLabel>
             <Input
-              id="user_id.first_name"
-              name="user_id.first_name"
-              value={formData.user_id.first_name}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="user_id.last_name">Last Name</InputLabel>
-            <Input
-              id="user_id.last_name"
-              name="user_id.last_name"
-              value={formData.user_id.last_name}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="user_id.email">Email</InputLabel>
-            <Input
-              id="user_id.email"
-              name="user_id.email"
-              value={formData.user_id.email}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="user_id.contact">Contact</InputLabel>
-            <Input
-              id="user_id.contact"
-              name="user_id.contact"
-              value={formData.user_id.contact}
+              id="contact"
+              name="contact"
+              value={formData.contact}
               onChange={handleChange}
             />
           </FormControl>
           {!editMode && (
             <FormControl sx={{ margin: 2 }}>
-              <InputLabel htmlFor="user_id.password">Password</InputLabel>
+              <InputLabel htmlFor="pincode">Pincode</InputLabel>
               <Input
-                id="user_id.password"
-                name="user_id.password"
-                value={formData.user_id.password}
+                id="pincode"
+                name="pincode"
+                value={formData.pincode}
                 onChange={handleChange}
-                type="password"
+                
               />
             </FormControl>
           )}
           <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="company-address">Company Address</InputLabel>
+            <InputLabel htmlFor="company-address">Address</InputLabel>
             <Input
-              id="company-address"
-              name="company_address"
-              value={formData.company_address}
+              id="address"
+              name="address"
+              value={formData.address}
               onChange={handleChange}
             />
           </FormControl>
@@ -310,17 +290,12 @@ function Project(props) {
           <TableHead sx={{ backgroundColor: "#53B789" }}>
             <TableRow>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Client Id
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Client Name
               </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
-                User Name
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
-                First Name
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Last Name
-              </TableCell>
+
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Email
               </TableCell>
@@ -328,7 +303,10 @@ function Project(props) {
                 Contact
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Company Address
+                Address
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Pincode
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Actions
@@ -346,14 +324,13 @@ function Project(props) {
                 )
                 .map((client) => (
                   <TableRow key={client.client_id}>
-                    <TableCell>{client.client_name}</TableCell>
-                    <TableCell>{client.user_id.user_name}</TableCell>
-                    <TableCell>{client.user_id.first_name}</TableCell>
-                    <TableCell>{client.user_id.last_name}</TableCell>
-                    <TableCell>{client.user_id.email}</TableCell>
-                    <TableCell>{client.user_id.contact}</TableCell>
-                    <TableCell>{client.company_address}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.client_id}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.client_name}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.email}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.contact}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.address}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>{client.pincode}</TableCell>
+                    <TableCell sx={{textAlign: "center" }}>
                       <IconButton
                         onClick={() => handleEdit(client)}
                         sx={{ color: "gray" }}

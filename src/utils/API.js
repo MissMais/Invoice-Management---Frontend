@@ -1,2 +1,2 @@
-const base_url = "http://192.168.29.90:8000";
+const base_url = "https://70ckt06pomws.share.zrok.io";
 export default base_url;

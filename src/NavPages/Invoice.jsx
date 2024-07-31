@@ -9,6 +9,7 @@ import {
   TableCell,
   IconButton,
   TableContainer,
+  FormHelperText,
   TableHead,
   TableRow,
   Paper,
@@ -17,6 +18,7 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import NavBar from "../NavBar";
@@ -26,14 +28,17 @@ import axios from "axios";
 import base_url from "../utils/API";
 
 import Select from "@mui/material/Select";
+import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 
 function Project(props) {
   const initialFormData = {
     client_id: "",
-    due_date: "",
+    invoice_number: "",
+    generated_date: "",
     total_amount: "",
     status: "",
+    invoice_item_id: [],
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -46,11 +51,35 @@ function Project(props) {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [client_id, setclient_id] = React.useState("");
+  const [invoiceItems, setInvoiceItems] = useState([]);
+  const [Option, setOption] = useState([]);
+  const [totalAmount, setTotalAmount] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     getData();
     getclient();
+    getDataMultiInvoiceItems();
   }, []);
+
+  const getDataMultiInvoiceItems = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/invoice_item/`);
+      console.log(response.data, "invice");
+      setOption(
+        response.data.map((item_invoice) => ({
+          label: item_invoice.project_name,
+          value: item_invoice.invoice_item_id,
+          price: item_invoice.item_price,
+          tax_amount: item_invoice.tax_amount,
+          totalAmount: item_invoice.item_price + item_invoice.tax_amount,
+        }))
+      );
+    } catch (err) {
+      console.log(err);
+      console.error("Error fetching data:", err);
+    }
+  };
 
   const getclient = async () => {
     try {
@@ -63,7 +92,7 @@ function Project(props) {
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/invoice/`);
-      console.log(response.data);
+      console.log(response.data, "table data");
       setTableData(response.data);
     } catch (err) {
       console.log(err);
@@ -72,8 +101,26 @@ function Project(props) {
   };
 
   function postDataToServer(values) {
+    const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
+    const formDataToSend = new FormData();
+    formDataToSend.append("invoice_pdf", pdfFile, "invoice.pdf");
+    formDataToSend.append("client_id", formData.client_id);
+    formDataToSend.append("invoice_number", formData.invoice_number);
+    formDataToSend.append("generated_date", formData.generated_date);
+    formDataToSend.append("total_amount", formData.total_amount);
+    formDataToSend.append("status", formData.status);
+    formDataToSend.append("invoice_item_id", formData.invoice_item_id);
+
+    // const pdfformdata = {
+    //   ...formData,
+    // invoice_pdf:formDataToSend.toString()
+    // }
     axios
-      .post(`${base_url}/client/invoice/`, formData)
+      .post(`${base_url}/client/invoice/`, formDataToSend, {
+        // headers: {
+        //   'Content-Type': 'multipart/form-data'
+        // }
+      })
       .then((res) => {
         console.log(res.data);
         getData();
@@ -83,6 +130,38 @@ function Project(props) {
         console.log(err);
       });
   }
+
+  const updateDataToServer = async (invoice_id) => {
+    try {
+      await axios.put(`${base_url}/client/invoice/`, formData);
+      getData();
+      alert("Invoice updated Successfully");
+    } catch (err) {
+      console.error("Error updating client:", err);
+    }
+  };
+
+  const deleteDataFromServer = async (invoice_id) => {
+    try {
+      await axios.delete(
+        `${base_url}/client/invoice/?delete=${invoice_id}`,
+        formData
+      );
+      getData();
+      alert("Invoice deleted Successfully");
+    } catch (err) {
+      console.error("Error deleting client:", err);
+    }
+  };
+
+  const handleChangeInvoiceMulti = (selectedOption) => {
+    setInvoiceItems(selectedOption);
+    console.log(invoiceItems, "ywiudddi");
+    setFormData({
+      ...formData,
+      invoice_item_id: selectedOption.map((o) => o.value),
+    });
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -110,16 +189,64 @@ function Project(props) {
       ...formData,
       [name]: value,
     });
+
+    if (name === "invoice_number") {
+      const pattern = /^[A-Z]{2}\/\d{4}\/\d{2}-\d{2}$/;
+      const trimmedValue = value.trim();
+
+      if (trimmedValue && !pattern.test(trimmedValue)) {
+        setError("ENTER IN THIS FORMAT: XX/0000/00-00");
+      } else {
+        setError("");
+      }
+    }
   };
 
-  const handleSubmit = () => {
+  // const handleSubmit = () => {
+  //   if (editMode) {
+  //     updateDataToServer();
+  //     const updatedData = [...tableData];
+  //     updatedData[editIndex] = formData;
+  //     setTableData(updatedData);
+  //   } else {
+  //     if (!error) {
+  //       postDataToServer();
+  //       setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
+  //     } else {
+  //       alert("Please fix the errors before submitting.");
+  //     }
+  //   }
+  //   setFormData(initialFormData);
+  //   handleCloseModal();
+  // };
+  const handleSubmit = async () => {
     if (editMode) {
+      await updateDataToServer();
       const updatedData = [...tableData];
       updatedData[editIndex] = formData;
       setTableData(updatedData);
     } else {
-      postDataToServer();
-      setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
+      if (!error) {
+        postDataToServer();
+        setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
+
+        const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
+        // const formDataToSend = new FormData();
+        // formData.append('invoice_pdf', pdfFile, 'invoice.pdf');
+
+        // try {
+        //   const response = await axios.post(`${base_url}/client/invoice/`, formData, {
+        //     headers: {
+        //       'Content-Type': 'multipart/form-data'
+        //     }
+        //   });
+        //   console.log('PDF uploaded successfully:', response.data);
+        // } catch (error) {
+        //   console.error('Error uploading PDF:', error);
+        // }
+      } else {
+        alert("Please fix the errors before submitting.");
+      }
     }
     setFormData(initialFormData);
     handleCloseModal();
@@ -142,14 +269,13 @@ function Project(props) {
     }
   };
 
-  const handleDelete = (index) => {
-    const updatedData = [...tableData];
-    updatedData.splice(index, 1);
-    setTableData(updatedData);
+  const handleDelete = (invoice_id) => {
+    deleteDataFromServer(invoice_id);
   };
 
   const handleInvoiceClick = (id) => {
     const invoice = tableData.find((item) => item.id === id);
+    console.log(invoice, "888888888");
     setInvoiceData(invoice);
     setIsInvoiceModalOpen(true);
   };
@@ -175,11 +301,11 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
-          invoiceData.invoice_number,
+          tableData.client_name,
+          invoiceData.client_name,
           invoiceData.order_number,
           invoiceData.invoice_date,
-          invoiceData.due_date,
+          invoiceData.generated_date,
         ],
       ],
     });
@@ -219,11 +345,11 @@ function Project(props) {
       ],
       body: [
         [
-          invoiceData.customer_name,
+          invoiceData.client_name,
           invoiceData.invoice_number,
           invoiceData.order_number,
           invoiceData.invoice_date,
-          invoiceData.due_date,
+          invoiceData.generated_date,
         ],
       ],
     });
@@ -260,35 +386,40 @@ function Project(props) {
           alignItems: "center",
         }}
       >
-        <TextField
-          type="search"
-          placeholder="Enter the Client Name"
-          onChange={(e) => setSearch(e.target.value)}
-          variant="outlined"
-          sx={{
-            flex: 1,
-            mr: 2,
-            "& .MuiOutlinedInput-root": {
-              height: "43px",
-              width: 780,
-              borderRadius: 16,
-            },
-          }}
-        />
-        <Button
-          onClick={() => handleOpenModal()}
-          size="medium"
-          variant="contained"
-          sx={{
-            color: "white",
-            backgroundColor: "#123270",
-            borderRadius: 2,
-            height: "40px",
-            "&:hover": { color: "black", backgroundColor: "#53B789" },
-          }}
-        >
-          ADD
-        </Button>
+        {" "}
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            type="search"
+            placeholder="Enter the Client Name"
+            onChange={(e) => setSearch(e.target.value)}
+            variant="outlined"
+            sx={{
+              flex: 1,
+              mr: 2,
+              "& .MuiOutlinedInput-root": {
+                height: "43px",
+                width: 780,
+                borderRadius: 16,
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Button
+            onClick={() => handleOpenModal()}
+            size="medium"
+            variant="contained"
+            sx={{
+              color: "white",
+              backgroundColor: "#123270",
+              borderRadius: 2,
+              height: "40px",
+              "&:hover": { color: "black", backgroundColor: "#53B789" },
+            }}
+          >
+            ADD
+          </Button>
+        </Grid>
       </Box>
       <Modal
         open={isModalOpen}
@@ -314,6 +445,20 @@ function Project(props) {
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Invoice" : "Add Invoice"}
           </Typography>
+          <FormControl sx={{ margin: 2 }}>
+            <InputLabel htmlFor="invoice-number">Invoice Number</InputLabel>
+            <Input
+              id="invoice-number"
+              name="invoice_number"
+              value={formData.invoice_number}
+              onChange={handleChange}
+              error={!!error}
+              placeholder="XX/0000/00-00"
+              inputProps={{ maxLength: 13 }}
+            />
+            {error && <FormHelperText error>{error}</FormHelperText>}
+          </FormControl>
+
           <FormControl sx={{ margin: 2, width: 200 }}>
             <InputLabel id="demo-simple-select-label">Client Name</InputLabel>
             <Select
@@ -330,13 +475,14 @@ function Project(props) {
             </Select>
           </FormControl>
 
-          <FormControl sx={{ margin: 2 }}>
-            <InputLabel htmlFor="due-date">Due Date</InputLabel>
+          <FormControl sx={{ margin: 2, marginTop: -1 }}>
+            {/* <InputLabel htmlFor="due-date">Due Date</InputLabel> */}
+            <label htmlFor="due-date">Generated Date</label>
             <Input
-              // type='date'
-              id="due-date"
-              name="due_date"
-              value={formData.due_date}
+              type="date"
+              id="generated-date"
+              name="generated_date"
+              value={formData.generated_date}
               onChange={handleChange}
             />
           </FormControl>
@@ -358,9 +504,22 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-
+          <ReactSelect
+            isMulti
+            isSearchable
+            value={invoiceItems}
+            // defaultValue={selectedOption}
+            placeholder="Enter Invoice Items"
+            onChange={handleChangeInvoiceMulti}
+            options={Option}
+          />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-            <Button variant="contained" color="success" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleSubmit}
+              disabled={!!error}
+            >
               {editMode ? "Update" : "Save"}
             </Button>
             <Button variant="outlined" color="error" onClick={handleCloseModal}>
@@ -369,7 +528,6 @@ function Project(props) {
           </Box>
         </Box>
       </Modal>
-
       <TableContainer component={Paper} sx={{ marginTop: 5 }}>
         <Table>
           <TableHead sx={{ m: 5, backgroundColor: "#53B789" }}>
@@ -378,16 +536,25 @@ function Project(props) {
                 ID
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Invoice Number
+              </TableCell>
+              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Client Name
+              </TableCell> */}
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Generated Date
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Due Date
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Amount
+                Total Amount
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Status
+              </TableCell>
+              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Invoice Items
+                </TableCell> */}
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
+                Details
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
@@ -412,23 +579,31 @@ function Project(props) {
                     "&:hover": { backgroundColor: "#dcf0e7" },
                   }}
                 >
-                  <TableCell
-                    sx={{ textAlign: "center", cursor: "pointer" }}
-                    onClick={() => handleInvoiceClick(row.id)}
-                  >
+                  <TableCell sx={{ textAlign: "center" }}>
                     {row.invoice_id}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.client_id?.client_name}
+                    {row.invoice_number}
                   </TableCell>
+                  {/* <TableCell sx={{ textAlign: "center" }}>
+                    {row.client_name}
+                  </TableCell> */}
                   <TableCell sx={{ textAlign: "center" }}>
-                    {row.due_date}
+                    {row.generated_date}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.total_amount}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.status}
+                  </TableCell>
+                  {/* <TableCell sx={{ textAlign: "center" }}>
+                    {row.invoice_item_id}
+                  </TableCell> */}
+                  <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
+                    <Button onClick={() => handleInvoiceClick(row.id)}>
+                      View Invoice
+                    </Button>
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     <IconButton
@@ -439,7 +614,7 @@ function Project(props) {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(row.invoice_id)}
                       aria-label="delete"
                       sx={{ color: "red" }}
                     >
@@ -487,7 +662,7 @@ function Project(props) {
                 Invoice Date: {invoiceData.invoice_date}
               </Typography>
               <Typography variant="body1">
-                Due Date: {invoiceData.due_date}
+                Due Date: {invoiceData.generated_date}
               </Typography>
               <Typography variant="body1">
                 Notes: {invoiceData.notes}

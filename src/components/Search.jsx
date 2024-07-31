@@ -6,6 +6,7 @@ import InputBase from "@mui/material/InputBase";
 
 import SearchIcon from "@mui/icons-material/Search";
 
+
 const Search = ({ data }) => {
   console.log(data, "yriurfylriei");
 
@@ -55,6 +56,7 @@ const Search = ({ data }) => {
 
   return (
     <div>
+      
       <Search sx={{ marginRight: 5 }}>
         <SearchIconWrapper>
           <SearchIcon />

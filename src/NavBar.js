@@ -6,6 +6,7 @@ import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
+import HomeIcon from "@mui/icons-material/Home";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -16,26 +17,22 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import Shop2Icon from "@mui/icons-material/Shop2";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import RedeemIcon from "@mui/icons-material/Redeem";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
 import Grid from "@mui/material/Grid";
 import Modal from "@mui/material/Modal";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import PaymentsIcon from "@mui/icons-material/Payments";
-import AddCardIcon from "@mui/icons-material/AddCard";
-import BadgeIcon from "@mui/icons-material/Badge";
+import GroupIcon from "@mui/icons-material/Group";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import { routeNames } from "./Base";
 import { useAuth } from "./auth";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
@@ -111,6 +108,26 @@ export default function NavBar() {
   const [modalOpen, setModalOpen] = React.useState(false);
   const location = useLocation();
   const { clearTokens } = useAuth();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openMenu = Boolean(anchorEl);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAddCompany = () => {
+    handleMenuClose();
+    navigate("/AddCompany");
+  };
+
+  const handleViewCompany = () => {
+    handleMenuClose();
+    navigate("/ViewCompany");
+  };
 
   const Logout = () => {
     clearTokens();
@@ -126,9 +143,6 @@ export default function NavBar() {
 
   function toClient() {
     navigate("/Client");
-  }
-  function toEmployee() {
-    navigate("/Employee");
   }
   function toProject() {
     navigate("/Project");
@@ -147,12 +161,6 @@ export default function NavBar() {
   }
   function toTax() {
     navigate("/Tax");
-  }
-  function toTechOption() {
-    navigate("/TechnologyOption");
-  }
-  function toTech() {
-    navigate("/Technology");
   }
 
   const handleModalOpen = () => {
@@ -210,6 +218,9 @@ export default function NavBar() {
               display: "block",
               backgroundColor:
                 location.pathname === routeNames.HOME ? "#53B789" : "initial",
+                
+              color:
+              location.pathname === routeNames.HOME ? "white" : "initial",
             }}
             onClick={() => navigate("/")}
           >
@@ -225,9 +236,12 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  
+                  color:
+                  location.pathname === routeNames.HOME ? "white" : "initial",
                 }}
               >
-                <InboxIcon />
+                <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
@@ -241,6 +255,9 @@ export default function NavBar() {
                 location.pathname === routeNames.INVOICE
                   ? "#53B789"
                   : "initial",
+                  
+              color:
+              location.pathname === routeNames.INVOICE ? "white" : "initial",
             }}
             onClick={() => navigate("/Invoice")}
           >
@@ -256,9 +273,11 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  color:
+                  location.pathname === routeNames.INVOICE ? "white" : "initial",
                 }}
               >
-                <RedeemIcon />
+                <ReceiptIcon />
               </ListItemIcon>
               <ListItemText primary="Invoice" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
@@ -269,6 +288,8 @@ export default function NavBar() {
               display: "block",
               backgroundColor:
                 location.pathname === routeNames.CLIENT ? "#53B789" : "initial",
+              color:
+                location.pathname === routeNames.CLIENT ? "white" : "initial",
             }}
             onClick={() => navigate("/Client")}
           >
@@ -284,24 +305,25 @@ export default function NavBar() {
                   minWidth: 0,
                   mr: open ? 3 : "auto",
                   justifyContent: "center",
+                  color:
+                  location.pathname === routeNames.CLIENT ? "white" : "initial",
                 }}
               >
-                <RedeemIcon />
+                <GroupIcon />
               </ListItemIcon>
               <ListItemText primary="Client" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
-
           <ListItem
             disablePadding
             sx={{
               display: "block",
               backgroundColor:
-                location.pathname === routeNames.PROJECT
-                  ? "#53B789"
+                location.pathname === routeNames.PROFILE
+                  ? "skyblue"
                   : "initial",
             }}
-            onClick={() => navigate("/Project")}
+            onClick={handleMenuOpen}
           >
             <ListItemButton
               sx={{
@@ -317,14 +339,62 @@ export default function NavBar() {
                   justifyContent: "center",
                 }}
               >
-                <RedeemIcon />
+                <AccountCircleIcon />
               </ListItemIcon>
-              <ListItemText primary="Project" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Profile" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         </List>
         <Divider />
       </Drawer>
+      <Menu
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        sx={{
+          "& .MuiPaper-root": {
+            marginTop: 1,
+            marginLeft: 1,
+            color: "black",
+            width: 220,
+            height: "auto",
+            // backgroundColor: "#123270",
+            borderRadius: 2,
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          },
+        }}
+      >
+        <MenuItem
+          sx={{
+            fontSize: "16px",
+            padding: "10px 20px",
+            paddingLeft: "50px",
+            "&:hover": {
+              color: "white",
+              backgroundColor: "#53B789",
+            },
+          }}
+          onClick={handleAddCompany}
+        >
+          Company Info
+        </MenuItem>
+        {/* <MenuItem
+          sx={{
+            fontSize: "16px",
+            padding: "10px 20px",
+            paddingLeft: "50px",
+
+            "&:hover": {
+              backgroundColor: "#53B789",
+            },
+          }}
+          onClick={handleViewCompany}
+        >
+          View Company
+        </MenuItem> */}
+      </Menu>
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
@@ -334,11 +404,11 @@ export default function NavBar() {
         <Box
           sx={{
             position: "absolute",
-            top: "55%",
-            left: "50%",
+            top: "45%",
+            left: "55%",
             transform: "translate(-50%, -50%)",
-            width: 950,
-            height: 400,
+            width: 800,
+            height: 300,
             bgcolor: "background.paper",
             border: "1px solid #000",
             borderRadius: 3,
@@ -369,22 +439,6 @@ export default function NavBar() {
                 </li>
                 <br />
                 <li>
-                  <Button
-                    onClick={toEmployee}
-                    sx={{
-                      color: "black",
-                      "&:hover": {
-                        color: "white",
-                        backgroundColor: "#53B789",
-                      },
-                    }}
-                  >
-                    + Employee
-                  </Button>
-                </li>
-
-                <br />
-                <li>
                   {" "}
                   <Button
                     onClick={toProject}
@@ -397,38 +451,6 @@ export default function NavBar() {
                     }}
                   >
                     + Project
-                  </Button>
-                </li>
-                <br />
-                <li>
-                  {" "}
-                  <Button
-                    onClick={toTech}
-                    sx={{
-                      color: "black",
-                      "&:hover": {
-                        color: "white",
-                        backgroundColor: "#53B789",
-                      },
-                    }}
-                  >
-                    + Technology
-                  </Button>
-                </li>
-                <br />
-                <li>
-                  {" "}
-                  <Button
-                    onClick={toTechOption}
-                    sx={{
-                      color: "black",
-                      "&:hover": {
-                        color: "white",
-                        backgroundColor: "#53B789",
-                      },
-                    }}
-                  >
-                    + Technology Options
                   </Button>
                 </li>
                 <br />
@@ -530,3 +552,4 @@ export default function NavBar() {
     </Box>
   );
 }
+
