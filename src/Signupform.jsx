@@ -26,10 +26,10 @@ export default function Signupform({setOpen}) {
           },
         }
       );
-      alert("User registered successfully");
-      setOpen(false)
-      reset();
-      navigate('/signin')
+        alert("User registered successfully");
+        setOpen(false);
+        reset();
+        navigate('/signin');
     } catch (error) {
       console.log("error");
       alert("An error occurred while registering");
