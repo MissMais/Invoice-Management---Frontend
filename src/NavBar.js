@@ -172,7 +172,7 @@ export default function NavBar() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }} xs sm md>
       <CssBaseline />
       <AppBar position="fixed" open={open} sx={{ bgcolor: "#123270" }}>
         <Toolbar>
