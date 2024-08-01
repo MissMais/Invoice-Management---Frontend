@@ -220,7 +220,7 @@ function Project(props) {
           }}
         >
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
-            {editMode ? "Edit Invoice" : "Add Invoice"}
+            {editMode ? "Edit Invoice Item" : "Add Invoice Item"}
           </Typography>
           
 
@@ -254,7 +254,7 @@ function Project(props) {
           </FormControl>
 
           <FormControl sx={{ margin: 2, width: 200 }}>
-            <InputLabel id="demo-simple-select-label">Tax Id</InputLabel>
+            <InputLabel id="demo-simple-select-label">Tax Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -307,7 +307,7 @@ function Project(props) {
                 Item Price
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Tax Id
+                Tax Name
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Tax Amount
