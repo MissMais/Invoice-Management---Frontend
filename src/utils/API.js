@@ -1,2 +1,3 @@
-const base_url = "https://z0o24hziadvp.share.zrok.io"
+
+const base_url = "https://invoice-management-alpha.vercel.app"
 export default base_url
