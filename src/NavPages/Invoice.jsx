@@ -102,7 +102,7 @@ function Project(props) {
 
   const getCompanyDetails = async () => {
     try {
-      const response = await axios.get(`${base_url}/client/company_details/`);
+      const response = await axios.get('http://localhost:4000/CompanyDetails');
       console.log(response.data, "Company Details");
       setCompanyDetails(response.data);
     } catch (err) {
@@ -815,10 +815,10 @@ function Project(props) {
 
             <div className="bank-details" style={styles.bankDetails}>
               <h5 style={{ textAlign: 'center', fontWeight: 'bold' }}><u>Bank Details</u></h5>
-              <div><u>Name:</u> {invoice.bankDetails.name}</div>
-              <div><u>A/c No.:</u> {invoice.bankDetails.accountNo}</div>
-              <div><u>Bank & IFSC:</u> {invoice.bankDetails.bankName} - {invoice.bankDetails.ifsc}</div>
-              <div><u>Branch:</u> {invoice.bankDetails.branch}</div>
+              <div><u>Name:</u> {CompanyDetails.company_name}</div>
+              <div><u>A/c No.:</u> {CompanyDetails.account_number}</div>
+              <div><u>Bank & IFSC:</u> {CompanyDetails.bank_name} - {CompanyDetails.ifsc_code}</div>
+              <div><u>Branch:</u> {CompanyDetails.branch_name}</div>
             </div>
             <div className="declaration" style={styles.declaration}>
               <h5 style={{ textAlign: 'center' }}><b><u>Declaration</u></b></h5>
@@ -826,7 +826,8 @@ function Project(props) {
             </div>
             <div className="signature" style={styles.signature}>
               <h5 style={{ textAlign: 'center' }}><b>FOR</b></h5>
-              <img style={styles.signatureImg} src="signature.png" alt="Signature" />
+              <img style={styles.signatureImg} src={CompanyDetails.digital_seal} alt="Signature" />
+              <img style={styles.signatureImg} src={CompanyDetails.digital_signature} alt="Seal" />
               <p>Authorized Signatory</p>
             </div>
           </div>
