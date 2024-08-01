@@ -112,11 +112,11 @@ function Project(props) {
     formDataToSend.append("invoice_item_id", formData.invoice_item_id);
 
     // const pdfformdata = {
-    //   ...formData,
-    // invoice_pdf:formDataToSend.toString()
-    // }
+    //   ...(formData + formDataToSend)
+    //   // invoice_pdf:formDataToSend.toString()
+    // };
     axios
-      .post(`${base_url}/client/invoice/`, formDataToSend, {
+      .post(`${base_url}/client/invoice/`, formData, {
         // headers: {
         //   'Content-Type': 'multipart/form-data'
         // }
@@ -287,6 +287,7 @@ function Project(props) {
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
+    console.log(doc.PDFObject);
     doc.text("Invoice Details", 20, 10);
     doc.autoTable({
       startY: 20,
