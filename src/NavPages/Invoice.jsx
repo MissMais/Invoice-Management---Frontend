@@ -109,7 +109,7 @@ function Project(props) {
 
   const getinvoice____ = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/invoice');
+      const response = await axios.get(`${base_url}/client/invoice/`);
       setInvoice(response.data);
     } catch (err) {
       console.error("There was an error fetching the invoice data!", error);

@@ -66,6 +66,7 @@ function Project(props) {
   };
   const getData = async () => {
     try {
+      axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'any value';
       const response = await axios.get(`${base_url}/client/invoice_item/`);
       console.log(response.data);
       setTableData(response.data);
@@ -298,7 +299,7 @@ function Project(props) {
             <TableRow>
               
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Invoice_Item_Id
+                Invoice Item Id
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Project Name

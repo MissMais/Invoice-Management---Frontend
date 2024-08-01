@@ -277,7 +277,7 @@ export default function AddCompany() {
                                 </Box>
                             ))
                         ) : (
-                            <Button variant="outlined" onClick={handleAdd}>Add</Button>
+                            <Button sx={{marginLeft:38}}variant="outlined" onClick={handleAdd}>Add Company details</Button>
                         )} {
                             (open || edit) && (
                                 <Modal
