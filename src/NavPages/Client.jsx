@@ -48,6 +48,7 @@ function Project(props) {
 
   const getData = async () => {
     try {
+       axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'any value';
       const response = await axios.get(`${base_url}/client/client/`);
       setTableData(response.data);
     } catch (err) {
@@ -63,6 +64,7 @@ function Project(props) {
     } catch (err) {
       console.error("Error adding client:", err);
     }
+    
   };
 
   const updateDataToServer = async (client_id) => {
@@ -254,7 +256,7 @@ function Project(props) {
               onChange={handleChange}
             />
           </FormControl>
-          {!editMode && (
+          {/* {!editMode && ( */}
             <FormControl sx={{ margin: 2 }}>
               <InputLabel htmlFor="pincode">Pincode</InputLabel>
               <Input
@@ -265,7 +267,7 @@ function Project(props) {
                 
               />
             </FormControl>
-          )}
+          {/* // )} */}
           <FormControl sx={{ margin: 2 }}>
             <InputLabel htmlFor="company-address">Address</InputLabel>
             <Input
