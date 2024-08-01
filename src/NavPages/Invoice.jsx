@@ -62,11 +62,13 @@ function Project(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
+  const [CompanyDetails, setCompanyDetails] = useState()
   useEffect(() => {
     getData();
     getclient();
     getDataMultiInvoiceItems();
     getinvoice____();
+    getCompanyDetails();
   }, []);
 
   const getDataMultiInvoiceItems = async () => {
@@ -98,6 +100,17 @@ function Project(props) {
     }
   };
 
+  const getCompanyDetails = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/company_details/`);
+      console.log(response.data, "Company Details");
+      setCompanyDetails(response.data);
+    } catch (err) {
+      console.log(err);
+      console.error("Error fetching data:", err);
+    }
+  };
+
   const getclient = async () => {
     try {
       const response = await axios.get(`${base_url}/client/client/`);
@@ -116,9 +129,10 @@ function Project(props) {
     }
   };
 
-  if (!invoice) {
-    return <div>Loading...</div>;
-  }
+  // if (!invoice) {
+  //   // return <div>Loading...</div>;
+  //   return 
+  // }
 
   const calculateTotalAmount = () => {
     return invoice.items.reduce((total, item) => total + item.taxableValue + (item.taxableValue * item.igst / 100), 0).toFixed(2);
@@ -399,6 +413,11 @@ function Project(props) {
     window.open(url);
   };
 
+    //  if (!invoice) {
+    //                return (<div>Loading...</div>)
+  
+    //                       }
+                          
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
       <NavBar />
@@ -652,8 +671,7 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
+      {invoice && (<Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
         <Box
           sx={{
             flexDirection: "column",
@@ -671,76 +689,7 @@ function Project(props) {
             borderRadius: 4,
             overflow:"scroll",
           }}
-        >
-          {/* <Typography id="modal-title" component="h2">
-            Invoice Details
-          </Typography>
-          {invoiceData && (
-            <>
-              <Typography variant="body1">
-                Customer Name: {invoiceData.customer_name}
-              </Typography>
-              <Typography variant="body1">
-                Invoice Number: {invoiceData.invoice_number}
-              </Typography>
-              <Typography variant="body1">
-                Order Number: {invoiceData.order_number}
-              </Typography>
-              <Typography variant="body1">
-                Invoice Date: {invoiceData.invoice_date}
-              </Typography>
-              <Typography variant="body1">
-                Due Date: {invoiceData.generated_date}
-              </Typography>
-              <Typography variant="body1">
-                Notes: {invoiceData.notes}
-              </Typography>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>{invoiceData.description}</TableCell>
-                    <TableCell>{invoiceData.quantity}</TableCell>
-                    <TableCell>{invoiceData.price}</TableCell>
-                    <TableCell>{invoiceData.amount}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handlePrintPDF}
-                >
-                  Print
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleDownloadPDF}
-                >
-                  Download PDF
-                </Button>
-                <Button
-                  variant="contained"
-                  color="info"
-                  onClick={handleEditInvoice}
-                >
-                  Edit
-                </Button>
-              </Box>        
-            </>
-          )} */}
-
+        >        
           <div className="invoice" style={styles.invoice_table
           }>
             <div className="head" style={styles.head}>
@@ -907,7 +856,7 @@ function Project(props) {
                 </Button>
               </Box> 
         </Box>
-      </Modal>
+      </Modal>)}
     </Box>
   );
 }
