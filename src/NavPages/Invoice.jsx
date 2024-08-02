@@ -242,23 +242,6 @@ function Project(props) {
     }
   };
 
-  // const handleSubmit = () => {
-  //   if (editMode) {
-  //     updateDataToServer();
-  //     const updatedData = [...tableData];
-  //     updatedData[editIndex] = formData;
-  //     setTableData(updatedData);
-  //   } else {
-  //     if (!error) {
-  //       postDataToServer();
-  //       setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
-  //     } else {
-  //       alert("Please fix the errors before submitting.");
-  //     }
-  //   }
-  //   setFormData(initialFormData);
-  //   handleCloseModal();
-  // };
   const handleSubmit = async () => {
     if (editMode) {
       await updateDataToServer();
@@ -269,21 +252,6 @@ function Project(props) {
       if (!error) {
         postDataToServer();
         setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
-
-        const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
-        // const formDataToSend = new FormData();
-        // formData.append('invoice_pdf', pdfFile, 'invoice.pdf');
-
-        // try {
-        //   const response = await axios.post(`${base_url}/client/invoice/`, formData, {
-        //     headers: {
-        //       'Content-Type': 'multipart/form-data'
-        //     }
-        //   });
-        //   console.log('PDF uploaded successfully:', response.data);
-        // } catch (error) {
-        //   console.error('Error uploading PDF:', error);
-        // }
       } else {
         alert("Please fix the errors before submitting.");
       }
@@ -415,11 +383,6 @@ function Project(props) {
     const url = URL.createObjectURL(blob);
     window.open(url);
   };
-
-  //  if (!invoice) {
-  //                return (<div>Loading...</div>)
-
-  //                       }
 
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
@@ -682,27 +645,27 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
-      {isInvoiceModalOpen && (
-        <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
-          <Box
-            sx={{
-              flexDirection: "column",
-              position: "absolute",
-              top: "50%",
-              bottom: "10%",
-              left: "60%",
-              transform: "translate(-50%, -50%)",
-              width: "100%",
-              height: "100%",
-              bgcolor: "background.paper",
-              border: "3px solid #455a64",
-              boxShadow: 24,
-              p: 4,
-              borderRadius: 4,
-              overflow: "scroll",
-            }}
-          >
-            {invoice ? (
+      <div>
+        {invoice && (
+          <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
+            <Box
+              sx={{
+                flexDirection: "column",
+                position: "absolute",
+                top: "50%",
+                bottom: "10%",
+                left: "60%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                height: "100%",
+                bgcolor: "background.paper",
+                border: "3px solid #455a64",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 4,
+                overflow: "scroll",
+              }}
+            >
               <div className="invoice" style={styles.invoice_table}>
                 <div className="head" style={styles.head}>
                   <h1 style={styles.headH1}>AFUCENT TECHNOLOGIES</h1>
@@ -920,43 +883,49 @@ function Project(props) {
                   <p>Authorized Signatory</p>
                 </div>
               </div>
-            ) : (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <h2>No Data Available</h2>
-                <p>
-                  Please make sure to select a valid invoice to view the
-                  details.
-                </p>
-              </div>
-            )}
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePrintPDF}
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
               >
-                Print
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleDownloadPDF}
-              >
-                Download PDF
-              </Button>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={handleEditInvoice}
-              >
-                Edit
-              </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePrintPDF}
+                >
+                  Print
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleDownloadPDF}
+                >
+                  Download PDF
+                </Button>
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={handleEditInvoice}
+                >
+                  Edit
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        </Modal>
+          </Modal>
+        )}
+      </div>
+      {!invoice && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <h2>No invoice data available</h2>
+        </div>
       )}
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          // onClick={handleCreateInvoice}
+        >
+          Create Invoice
+        </Button>
+      </div>
     </Box>
   );
 }
