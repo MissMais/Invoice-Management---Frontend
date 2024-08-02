@@ -66,6 +66,7 @@ function Project(props) {
   };
   const getData = async () => {
     try {
+      axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'any value';
       const response = await axios.get(`${base_url}/client/invoice_item/`);
       console.log(response.data);
       setTableData(response.data);
@@ -220,7 +221,7 @@ function Project(props) {
           }}
         >
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
-            {editMode ? "Edit Invoice" : "Add Invoice"}
+            {editMode ? "Edit Invoice Item" : "Add Invoice Item"}
           </Typography>
           
 
@@ -254,7 +255,7 @@ function Project(props) {
           </FormControl>
 
           <FormControl sx={{ margin: 2, width: 200 }}>
-            <InputLabel id="demo-simple-select-label">Tax Id</InputLabel>
+            <InputLabel id="demo-simple-select-label">Tax Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -298,7 +299,7 @@ function Project(props) {
             <TableRow>
               
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Invoice_Item_Id
+                Invoice Item Id
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Project Name
@@ -307,7 +308,7 @@ function Project(props) {
                 Item Price
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Tax Id
+                Tax Name
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Tax Amount

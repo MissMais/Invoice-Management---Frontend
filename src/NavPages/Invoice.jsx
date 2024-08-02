@@ -36,7 +36,6 @@ import html2canvas from 'html2canvas';
 // import Bill from "../Bill"
 // import "../"
 
-
 function Project(props) {
   const initialFormData = {
     client_id: "",
@@ -45,8 +44,6 @@ function Project(props) {
     total_amount: "",
     status: "",
     invoice_item_id: [],
-    // invoice_pdf: "", 
-
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -64,13 +61,13 @@ function Project(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
+
   const [CompanyDetails, setCompanyDetails] = useState()
   const invoiceRef = useRef();
   useEffect(() => {
     getData();
     getclient();
     getDataMultiInvoiceItems();
-    getCompanyDetails();
   }, []);
 
   const getDataMultiInvoiceItems = async () => {
@@ -105,7 +102,7 @@ function Project(props) {
   const getCompanyDetails = async () => {
     try {
       const response = await axios.get(`${base_url}/client/company_details/`);
-      console.log(response.data, "Company Details");
+      // console.log(response.data, "Company Details");
       setCompanyDetails(response.data);
     } catch (err) {
       console.log(err);
@@ -124,6 +121,7 @@ function Project(props) {
 
   const getinvoice____ = async (invoice_id) => {
     try {
+
       const response = await axios.get(`${base_url}/client/invoice/?invoice_id=${invoice_id}`);
       setInvoice(response.data);
     } catch (err) {
@@ -133,7 +131,7 @@ function Project(props) {
 
   // if (!invoice) {
   //   // return <div>Loading...</div>;
-  //   return 
+  //   return
   // }
 
   // const calculateTotalAmount = () => {
@@ -148,12 +146,11 @@ function Project(props) {
     // formDataToSend.append('generated_date', formData.generated_date);
     // formDataToSend.append('total_amount', formData.total_amount);
     // formDataToSend.append('status', formData.status);
-    // formDataToSend.append('invoice_item_id', formData.invoice_item_id);
-
+    // formDataToSend.append('invoice_item_id', formData.invoice_item_id)
     // const pdfformdata = {
-    //   ...formData,
-    // invoice_pdf:formDataToSend.toString()
-    // }
+    //   ...(formData + formDataToSend)
+    //   // invoice_pdf:formDataToSend.toString()
+    // };
     axios
       .post(`${base_url}/client/invoice/`, formData, {
         // headers: {
@@ -269,8 +266,7 @@ function Project(props) {
         postDataToServer();
         setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
 
-
-        const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
+        const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
         // const formDataToSend = new FormData();
         // formData.append('invoice_pdf', pdfFile, 'invoice.pdf');
 
@@ -323,6 +319,7 @@ function Project(props) {
 
   const ViewPdf = (invoice_id) => {
     getinvoice____(invoice_id);
+    getCompanyDetails();
     // const invoice = tableData.find((item) => item.invoice_item_id === id);
     setIsInvoiceModalOpen(true);
     setInvoiceData(invoice);
@@ -442,11 +439,11 @@ function Project(props) {
   //   window.open(url);
   // };
 
-    //  if (!invoice) {
-    //                return (<div>Loading...</div>)
-  
-    //                       }
-                          
+  //  if (!invoice) {
+  //                return (<div>Loading...</div>)
+
+  //                       }
+
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
       <NavBar />
@@ -677,6 +674,8 @@ function Project(props) {
                     <Button variant="standard"
                       sx={{ textTransform: 'none', "&:hover": { color: "black", backgroundColor: "#53B789" }, }}
                       onClick={() => ViewPdf(row.invoice_id)}>
+                    
+
                       View Invoice
                     </Button>
                   </TableCell>
@@ -809,43 +808,55 @@ function Project(props) {
               <p>{invoice.amountInWords}</p>
             </div>
             <div className="amount-summary" style={styles.amountSummary}>
-              {/* <div><u>Total Amount Before Tax:</u> {invoice.totalAmountBeforeTax}</div>
+              {/*
         <div><u>IGST:</u> {invoice.totalIGST}</div>
         <div><u>Total Tax:</u> {invoice.totalTax}</div>
         <div><u>Total Amount with Tax:</u> {invoice.totalAmountWithTax}</div>
         <div><u>Net Amount Payable in Rs.:</u> {invoice.netAmountPayable}</div>
         <div><u>Advance Amount Paid Rs.:</u> {invoice.advanceAmountPaid}</div>
         <div><u>Balance Amount Payable Rs.:</u> {invoice.balanceAmountPayable}</div> */}
-              <table className='invoice-table-amount'>
-                <tbody>
-                  <tr>
-                    <td>Total Amount Before Tax: {invoice.totalAmountBeforeTax}</td>
-                  </tr>
-                  <tr>
-                    <td>IGST: {invoice.totalIGST}</td>
-                  </tr>
-                  <tr>
-                    <td>Total Tax: {invoice.totalTax}</td>
-                  </tr>
-                  <tr>
-                    <td>Total Amount with Tax: {invoice.totalAmountWithTax}</td>
-                  </tr>
-                  <tr>
-                    <td>Net Amount Payable in Tax: {invoice.netAmountPayable}</td>
-                  </tr>
-                  <tr>
-                    <td>Advance Amount Paid Rs.: {invoice.advanceAmountPaid}</td>
-                  </tr>
-                  <tr>
-                    <td>Balance Amount Payable Rs.: {invoice.balanceAmountPayable}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                  <table className="invoice-table-amount">
+                    <tbody>
+                      <tr>
+                        <td>
+                          Total Amount Before Tax:{" "}
+                          {invoice.totalAmountBeforeTax}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>IGST: {invoice.totalIGST}</td>
+                      </tr>
+                      <tr>
+                        <td>Total Tax: {invoice.totalTax}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Total Amount with Tax: {invoice.totalAmountWithTax}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Net Amount Payable in Tax: {invoice.netAmountPayable}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Advance Amount Paid Rs.: {invoice.advanceAmountPaid}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Balance Amount Payable Rs.:{" "}
+                          {invoice.balanceAmountPayable}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
             <div className="bank-details" style={styles.bankDetails}>
               <h5 style={{ textAlign: 'center', fontWeight: 'bold' }}><u>Bank Details</u></h5>
-              <div><u>Name:</u> {CompanyDetails.bank_name}</div>
+              <div><u>Name:</u> {CompanyDetails.company_name}</div>
               <div><u>A/c No.:</u> {CompanyDetails.account_number}</div>
               <div><u>Bank & IFSC:</u> {CompanyDetails.bank_name} - {CompanyDetails.ifsc_code}</div>
               <div><u>Branch:</u> {CompanyDetails.branch_name}</div>
@@ -867,7 +878,7 @@ function Project(props) {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handlePrintPDF}
+                  // onClick={handlePrintPDF}
                 >
                   Print
                 </Button>
@@ -893,12 +904,12 @@ function Project(props) {
 }
 
 const styles = {
-  invoice_table :{
-    fontFamily: 'Arial, sans-serif',
-    margin: '20px auto',
-    border: '2px solid black',
-    width: '80%',
-    display: 'grid',
+  invoice_table: {
+    fontFamily: "Arial, sans-serif",
+    margin: "20px auto",
+    border: "2px solid black",
+    width: "80%",
+    display: "grid",
     gridTemplateAreas: `
 "header header"
 "logo company-address"
@@ -909,119 +920,119 @@ const styles = {
 "bank-details amount-summary"
 "declaration signature"
 `,
-    gridGap: '10px',
-    padding: '4px',
-    marginBottom:10
+    gridGap: "10px",
+    padding: "4px",
+    marginBottom: 10,
   },
   head: {
-    gridArea: 'header',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: '#123270',
-    color: 'aliceblue',
-    padding: '10px',
+    gridArea: "header",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "#123270",
+    color: "aliceblue",
+    padding: "10px",
   },
   headH1: {
     fontFamily: "'Times New Roman', Times, serif",
     margin: 0,
   },
   invoiceLogo: {
-    gridArea: 'logo',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    gridArea: "logo",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
   invoiceLogoImg: {
-    maxWidth: '100px',
+    maxWidth: "100px",
   },
   invoiceAddress: {
-    gridArea: 'company-address',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    textAlign: 'right',
+    gridArea: "company-address",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    textAlign: "right",
   },
   invoiceHeader: {
-    gridArea: 'tax-invoice',
-    border: '1px solid black',
+    gridArea: "tax-invoice",
+    border: "1px solid black",
     margin: 0,
-    fontWeight: 'bolder',
-    padding: '10px',
+    fontWeight: "bolder",
+    padding: "10px",
   },
   invoiceHeaderH2: {
-    fontSize: '21px',
-    margin: '5px 0',
-    fontWeight: 'bolder',
-    textDecoration: 'underline',
-     textAlign: 'center'
+    fontSize: "21px",
+    margin: "5px 0",
+    fontWeight: "bolder",
+    textDecoration: "underline",
+    textAlign: "center",
   },
   invoiceDetails: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    lineHeight: '33px',
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "10px",
+    lineHeight: "33px",
   },
   invoiceBuyer: {
-    gridArea: 'buyer-details',
-    border: '1px solid black',
+    gridArea: "buyer-details",
+    border: "1px solid black",
     margin: 0,
-    fontWeight: 'bolder',
-    padding: '10px',
+    fontWeight: "bolder",
+    padding: "10px",
   },
   invoiceTable: {
-    gridArea: 'items-table',
-    width: '100%',
-    borderCollapse: 'collapse',
-    marginTop: '20px',
+    gridArea: "items-table",
+    width: "100%",
+    borderCollapse: "collapse",
+    marginTop: "20px",
   },
   invoiceTableTh: {
-    border: '1px solid #000',
-    padding: '8px',
-    textAlign: 'left',
+    border: "1px solid #000",
+    padding: "8px",
+    textAlign: "left",
   },
   invoiceTableTd: {
-    border: '1px solid #000',
-    padding: '8px',
-    textAlign: 'left',
+    border: "1px solid #000",
+    padding: "8px",
+    textAlign: "left",
   },
   totalWords: {
-    gridArea: 'total-words',
-    fontWeight: 'bold',
-    padding: '10px',
-    width: '100%',
+    gridArea: "total-words",
+    fontWeight: "bold",
+    padding: "10px",
+    width: "100%",
   },
   amountSummary: {
-    gridArea: 'amount-summary',
-    marginTop: '-5px',
-    fontWeight: 'bold',
+    gridArea: "amount-summary",
+    marginTop: "-5px",
+    fontWeight: "bold",
   },
   bankDetails: {
-    gridArea: 'bank-details',
-    fontWeight: 'bold',
-    border: '1px solid black',
-    padding: '10px',
-    width: '70%',
+    gridArea: "bank-details",
+    fontWeight: "bold",
+    border: "1px solid black",
+    padding: "10px",
+    width: "70%",
   },
   declaration: {
-    gridArea: 'declaration',
-    padding: '10px',
-    textAlign: 'left',
-    display: 'flex',
-    flexDirection: 'column',
-    width: 'inherit',
+    gridArea: "declaration",
+    padding: "10px",
+    textAlign: "left",
+    display: "flex",
+    flexDirection: "column",
+    width: "inherit",
   },
   declarationP: {
-    margin: '10px 0',
+    margin: "10px 0",
   },
   signature: {
-    gridArea: 'signature',
-    padding: '10px',
+    gridArea: "signature",
+    padding: "10px",
   },
   signatureImg: {
-    maxWidth: '100px',
-    marginLeft: '10px',
+    maxWidth: "100px",
+    marginLeft: "10px",
   },
 };
 export default Project;
