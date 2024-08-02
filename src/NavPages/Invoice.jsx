@@ -117,9 +117,10 @@ function Project(props) {
     }
   };
 
-  const getinvoice____ = async () => {
+  const getinvoice____ = async (invoice_id) => {
     try {
-      const response = await axios.get(`${base_url}/client/invoice/`);
+
+      const response = await axios.get(`${base_url}/client/invoice/?invoice_id=${invoice_id}`);
       setInvoice(response.data);
     } catch (err) {
       console.error("There was an error fetching the invoice data!", error);
@@ -131,32 +132,25 @@ function Project(props) {
   //   return
   // }
 
-  const calculateTotalAmount = () => {
-    return invoice.items
-      .reduce(
-        (total, item) =>
-          total + item.taxableValue + (item.taxableValue * item.igst) / 100,
-        0
-      )
-      .toFixed(2);
-  };
+  // const calculateTotalAmount = () => {
+  //   return invoice.items.reduce((total, item) => total + item.tax_amount + (item.tax_amount * item.tax_rate / 100), 0).toFixed(2);
+  // };
   function postDataToServer(values) {
-    const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
-    const formDataToSend = new FormData();
-    formDataToSend.append("invoice_pdf", pdfFile, "invoice.pdf");
-    formDataToSend.append("client_id", formData.client_id);
-    formDataToSend.append("invoice_number", formData.invoice_number);
-    formDataToSend.append("generated_date", formData.generated_date);
-    formDataToSend.append("total_amount", formData.total_amount);
-    formDataToSend.append("status", formData.status);
-    formDataToSend.append("invoice_item_id", formData.invoice_item_id);
-
+    // const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
+    // const formDataToSend = new FormData();
+    // formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
+    // formDataToSend.append('client_id', formData.client_id);
+    // formDataToSend.append('invoice_number', formData.invoice_number);
+    // formDataToSend.append('generated_date', formData.generated_date);
+    // formDataToSend.append('total_amount', formData.total_amount);
+    // formDataToSend.append('status', formData.status);
+    // formDataToSend.append('invoice_item_id', formData.invoice_item_id)
     // const pdfformdata = {
     //   ...(formData + formDataToSend)
     //   // invoice_pdf:formDataToSend.toString()
     // };
     axios
-      .post(`${base_url}/client/invoice/`, formDataToSend, {
+      .post(`${base_url}/client/invoice/`, formData, {
         // headers: {
         //   'Content-Type': 'multipart/form-data'
         // }
@@ -318,6 +312,16 @@ function Project(props) {
     console.log(invoice, "888888888");
     setInvoiceData(invoice);
     setIsInvoiceModalOpen(true);
+  };
+
+
+  const ViewPdf = (invoice_id) => {
+    getinvoice____(invoice_id);
+    // const invoice = tableData.find((item) => item.invoice_item_id === id);
+    setIsInvoiceModalOpen(true);
+    setInvoiceData(invoice);
+    // console.log(invoice_id, "data by abu Qatata bhai");
+  
   };
 
   const handleCloseInvoiceModal = () => {
@@ -617,6 +621,7 @@ function Project(props) {
               })
               .map((row, index) => (
                 <TableRow
+                
                   key={index}
                   sx={{
                     m: 5,
@@ -647,17 +652,11 @@ function Project(props) {
                     {row.invoice_item_id}
                   </TableCell> */}
                   <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
-                    <Button
-                      variant="standard"
-                      sx={{
-                        textTransform: "none",
-                        "&:hover": {
-                          color: "black",
-                          backgroundColor: "#53B789",
-                        },
-                      }}
-                      onClick={() => handleInvoiceClick(row.id)}
-                    >
+                    <Button variant="standard"
+                      sx={{ textTransform: 'none', "&:hover": { color: "black", backgroundColor: "#53B789" }, }}
+                      onClick={() => ViewPdf(row.invoice_id)}>
+                    
+
                       View Invoice
                     </Button>
                   </TableCell>
@@ -682,152 +681,115 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
-      {isInvoiceModalOpen && (
-        <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
-          <Box
-            sx={{
-              flexDirection: "column",
-              position: "absolute",
-              top: "50%",
-              bottom: "10%",
-              left: "60%",
-              transform: "translate(-50%, -50%)",
-              width: "100%",
-              height: "100%",
-              bgcolor: "background.paper",
-              border: "3px solid #455a64",
-              boxShadow: 24,
-              p: 4,
-              borderRadius: 4,
-              overflow: "scroll",
-            }}
-          >
-            {invoice ? (
-              <div className="invoice" style={styles.invoice_table}>
-                <div className="head" style={styles.head}>
-                  <h1 style={styles.headH1}>AFUCENT TECHNOLOGIES</h1>
+      {invoice && (<Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
+        <Box
+          sx={{
+            flexDirection: "column",
+            position: "absolute",
+            top: "50%",
+            bottom:"10%",
+            left: "60%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            height: '100%',
+            bgcolor: "background.paper",
+            border: "3px solid #455a64",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 4,
+            overflow:"scroll",
+          }}
+        >        
+          <div className="invoice" style={styles.invoice_table
+          }>
+            <div className="head" style={styles.head}>
+              <h1 style={styles.headH1}>AFUCENT TECHNOLOGIES</h1>
+            </div>
+            <div className="invoice-logo"style={styles.invoiceLogo}>
+              <img style={{maxWidth: '100px'}} src="logo.png" alt="Invoice logo" />
+            </div>
+            <div className="invoice-address" style={styles.invoiceAddress}>
+              <p>4th Floor, New Janpath Complex<br />
+                9 Ashok Marg, Hazratganj, LUCKNOW<br />
+                Uttar Pradesh - 226001</p>
+            </div>
+            <div className="invoice-header" style={styles.invoiceHeader}>
+              <h2 style={styles.invoiceHeaderH2}>Tax Invoice</h2>
+              <div className="invoice-details" style={styles.invoiceDetails}>
+                <div style={{ width: '60%' }}>
+                  <div>Invoice No.: {invoice.invoice_number}</div>
+                  <div>Invoice Date: {invoice.generated_date}</div>
+                  <div>Due Date: {invoice.generated_date}</div>
+                  <div>State: {invoice.client_address}</div>
                 </div>
-                <div className="invoice-logo" style={styles.invoiceLogo}>
-                  <img
-                    style={{ maxWidth: "100px" }}
-                    src="logo.png"
-                    alt="Invoice logo"
-                  />
+                <div style={{ width: '40%' }}>
+                  <div>GSTIN/UIN: {invoice.client_pincode}</div>
+                  <div>Ref. No. & Date: {invoice.client_pincode}</div>
+                  <div>Buyer Order No. & Date: {invoice.client_pincode}</div>
+                  <div>Delivery Note: {invoice.client_pincode}</div>
+                  <div>Destination: {invoice.client_pincode}</div>
                 </div>
-                <div className="invoice-address" style={styles.invoiceAddress}>
-                  <p>
-                    4th Floor, New Janpath Complex
-                    <br />
-                    9 Ashok Marg, Hazratganj, LUCKNOW
-                    <br />
-                    Uttar Pradesh - 226001
-                  </p>
-                </div>
-                <div className="invoice-header" style={styles.invoiceHeader}>
-                  <h2 style={styles.invoiceHeaderH2}>Tax Invoice</h2>
-                  <div
-                    className="invoice-details"
-                    style={styles.invoiceDetails}
-                  >
-                    <div style={{ width: "60%" }}>
-                      <div>Invoice No.: {invoice.invoiceNo}</div>
-                      <div>Invoice Date: {invoice.invoiceDate}</div>
-                      <div>Due Date: {invoice.dueDate}</div>
-                      <div>State: {invoice.state}</div>
-                    </div>
-                    <div style={{ width: "40%" }}>
-                      <div>GSTIN/UIN: {invoice.gstin}</div>
-                      <div>Ref. No. & Date: {invoice.refNo}</div>
-                      <div>Buyer Order No. & Date: {invoice.buyerOrderNo}</div>
-                      <div>Delivery Note: {invoice.deliveryNote}</div>
-                      <div>Destination: {invoice.destination}</div>
-                    </div>
-                  </div>
-                </div>
+              </div>
+            </div>
 
-                <div className="invoice-buyer" style={styles.invoiceBuyer}>
-                  <h2 style={{ textAlign: "center" }}>Buyer (Bill to Party)</h2>
-                  <div className="buyer-details">
-                    <div style={{ width: "60%" }}>
-                      <div>Name: {invoice.buyer.name}</div>
-                      <div>Address: {invoice.buyer.address}</div>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <div>City: {invoice.buyer.city}</div>
-                        <div>PIN: {invoice.buyer.pin}</div>
-                        <div>State: {invoice.buyer.state}</div>
-                      </div>
-                    </div>
-                    <div style={{ width: "40%" }}>
-                      <div>GSTIN/UIN: {invoice.buyer.gstin}</div>
-                    </div>
+            <div className="invoice-buyer" style={styles.invoiceBuyer}>
+              <h2 style={{ textAlign: 'center' }}>Buyer (Bill to Party)</h2>
+              <div className="buyer-details">
+                <div style={{ width: '60%' }}>
+                  <div>Name: {invoice.client_name}</div>
+                  <div>Address: {invoice.client_address}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div>City: {invoice.client_address}</div>
+                    <div>PIN: {invoice.client_pincode}</div>
+                    <div>State: {invoice.client_address}</div>
                   </div>
                 </div>
-                <table className="invoice-table" style={styles.invoiceTable}>
-                  <thead style={styles.invoiceTableTh}>
-                    <tr>
-                      <th>SN</th>
-                      <th>Product Description</th>
-                      <th>Qty</th>
-                      <th>Rate Rs</th>
-                      <th>Taxable Value</th>
-                      <th>%</th>
-                      <th>IGST</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody style={styles.invoiceTableTd}>
-                    {invoice.items.map((item, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>{item.description}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.rate}</td>
-                        <td>{item.taxableValue}</td>
-                        <td>{item.igst}</td>
-                        <td>
-                          {((item.taxableValue * item.igst) / 100).toFixed(2)}
-                        </td>
-                        <td>
-                          {(
-                            item.taxableValue +
-                            (item.taxableValue * item.igst) / 100
-                          ).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{ textAlign: "center", fontWeight: "bold" }}
-                      >
-                        Total
-                      </td>
-                      <td colSpan="2" style={{ fontWeight: "bold" }}>
-                        {invoice.totalQuantity}
-                      </td>
-                      <td colSpan="2" style={{ fontWeight: "bold" }}>
-                        {invoice.totalTaxableValue}
-                      </td>
-                      <td style={{ fontWeight: "bold" }}>
-                        {invoice.totalIGST}
-                      </td>
-                      <td style={{ fontWeight: "bold" }}>
-                        Rs {calculateTotalAmount()}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div className="total-words" style={styles.totalWords}>
-                  <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
-                  <p>{invoice.amountInWords}</p>
+                <div style={{ width: '40%' }}>
+                  <div>GSTIN/UIN: {invoice.client_address}</div>
                 </div>
-                <div className="amount-summary" style={styles.amountSummary}>
-                  {/* <div><u>Total Amount Before Tax:</u> {invoice.totalAmountBeforeTax}</div>
+              </div>
+            </div>
+            <table className="invoice-table" style={styles.invoiceTable}>
+              <thead style={styles.invoiceTableTh}>
+                <tr>
+                  <th>SN</th>
+                  <th>Product Description</th>
+                  <th>Qty</th>
+                  <th>Rate Rs</th>
+                  <th>Taxable Value</th>
+                  <th>%</th>
+                  <th>IGST</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody style={styles.invoiceTableTd}>
+                {invoice.invoice_item_id.map((item, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.project_name}</td>
+                    <td>{item.tax_id}</td>
+                    <td>{item.item_price}</td>
+                    <td>{item.tax_amount}</td>
+                    <td>{item.tax_rate}</td>
+                    <td>{(item.tax_amount)}</td>
+                    <td>{(item.tax_amount)}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan="2" style={{ textAlign: 'center', fontWeight: 'bold' }}>Total</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_rate}</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>{invoice.total_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>Rs {invoice.total_amount}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="total-words" style={styles.totalWords}>
+              <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
+              <p>{invoice.amountInWords}</p>
+            </div>
+            <div className="amount-summary" style={styles.amountSummary}>
+              {/*
         <div><u>IGST:</u> {invoice.totalIGST}</div>
         <div><u>Total Tax:</u> {invoice.totalTax}</div>
         <div><u>Total Amount with Tax:</u> {invoice.totalAmountWithTax}</div>
