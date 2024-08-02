@@ -388,7 +388,7 @@ function Project(props) {
   };
 
 
-  const handlePrintPDF = useReactToPrint({
+  const handlegetPDF = useReactToPrint({
     content: () => invoiceRef.current,
     documentTitle: 'invoice',
     onAfterPrint: () => alert('Print successful'),
@@ -854,74 +854,31 @@ function Project(props) {
                   </table>
                 </div>
 
-                <div className="bank-details" style={styles.bankDetails}>
-                  <h5 style={{ textAlign: "center", fontWeight: "bold" }}>
-                    <u>Bank Details</u>
-                  </h5>
-                  <div>
-                    <u>Name:</u> {CompanyDetails.company_name}
-                  </div>
-                  <div>
-                    <u>A/c No.:</u> {CompanyDetails.account_number}
-                  </div>
-                  <div>
-                    <u>Bank & IFSC:</u> {CompanyDetails.bank_name} -{" "}
-                    {CompanyDetails.ifsc_code}
-                  </div>
-                  <div>
-                    <u>Branch:</u> {CompanyDetails.branch_name}
-                  </div>
-                </div>
-                <div className="declaration" style={styles.declaration}>
-                  <h5 style={{ textAlign: "center" }}>
-                    <b>
-                      <u>Declaration</u>
-                    </b>
-                  </h5>
-                  <p style={styles.declarationP}>
-                    We declare that this invoice shows the actual price of the
-                    goods described and that all particulars are true and
-                    correct.
-                  </p>
-                </div>
-                <div className="signature" style={styles.signature}>
-                  <h5 style={{ textAlign: "center" }}>
-                    <b>FOR</b>
-                  </h5>
-                  <img
-                    style={styles.signatureImg}
-                    src={CompanyDetails.digital_seal}
-                    alt="Signature"
-                  />
-                  <img
-                    style={styles.signatureImg}
-                    src={CompanyDetails.digital_signature}
-                    alt="Seal"
-                  />
-                  <p>Authorized Signatory</p>
-                </div>
-              </div>
-            ) : (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <h2>No Data Available</h2>
-                <p>
-                  Please make sure to select a valid invoice to view the
-                  details.
-                </p>
-              </div>
-            )}
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePrintPDF}
+            <div className="bank-details" style={styles.bankDetails}>
+              <h5 style={{ textAlign: 'center', fontWeight: 'bold' }}><u>Bank Details</u></h5>
+              <div><u>Name:</u> {CompanyDetails.company_name}</div>
+              <div><u>A/c No.:</u> {CompanyDetails.account_number}</div>
+              <div><u>Bank & IFSC:</u> {CompanyDetails.bank_name} - {CompanyDetails.ifsc_code}</div>
+              <div><u>Branch:</u> {CompanyDetails.branch_name}</div>
+            </div>
+            <div className="declaration" style={styles.declaration}>
+              <h5 style={{ textAlign: 'center' }}><b><u>Declaration</u></b></h5>
+              <p style={styles.declarationP}>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.</p>
+            </div>
+            <div className="signature" style={styles.signature}>
+              <h5 style={{ textAlign: 'center' }}><b>FOR</b></h5>
+              <img style={styles.signatureImg} src={CompanyDetails.digital_seal} alt="Signature" />
+              <img style={styles.signatureImg} src={CompanyDetails.digital_signature} alt="Seal" />
+              <p>Authorized Signatory</p>
+            </div>
+          </div>
+          <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
               >
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handlePrintPDF}
+                  // onClick={handlePrintPDF}
                 >
                   Print
                 </Button>
