@@ -391,7 +391,7 @@ function Project(props) {
   };
 
 
-  const handlePrintPDF = useReactToPrint({
+  const handlegetPDF = useReactToPrint({
     content: () => invoiceRef.current,
     documentTitle: 'invoice',
     onAfterPrint: () => alert('Print successful'),
@@ -845,7 +845,7 @@ function Project(props) {
 
             <div className="bank-details" style={styles.bankDetails}>
               <h5 style={{ textAlign: 'center', fontWeight: 'bold' }}><u>Bank Details</u></h5>
-              <div><u>Name:</u> {CompanyDetails.company_name}</div>
+              <div><u>Name:</u> {CompanyDetails.bank_name}</div>
               <div><u>A/c No.:</u> {CompanyDetails.account_number}</div>
               <div><u>Bank & IFSC:</u> {CompanyDetails.bank_name} - {CompanyDetails.ifsc_code}</div>
               <div><u>Branch:</u> {CompanyDetails.branch_name}</div>
