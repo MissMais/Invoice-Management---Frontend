@@ -120,9 +120,10 @@ function Project(props) {
     }
   };
 
-  const getinvoice____ = async () => {
+  const getinvoice____ = async (invoice_id) => {
     try {
-      const response = await axios.get('http://localhost:4000/invoice');
+      const response = await axios.get(`${base_url}/client/invoice/?invoice_id=${invoice_id}`);
+      console.log(response.data, "abu qatata bhai");
       setInvoice(response.data);
     } catch (err) {
       console.error("There was an error fetching the invoice data!", error);
@@ -134,26 +135,26 @@ function Project(props) {
   //   return 
   // }
 
-  const calculateTotalAmount = () => {
-    return invoice.items.reduce((total, item) => total + item.taxableValue + (item.taxableValue * item.igst / 100), 0).toFixed(2);
-  };
+  // const calculateTotalAmount = () => {
+  //   return invoice.items.reduce((total, item) => total + item.tax_amount + (item.tax_amount * item.tax_rate / 100), 0).toFixed(2);
+  // };
   function postDataToServer(values) {
-    const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
-    const formDataToSend = new FormData();
-    formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
-    formDataToSend.append('client_id', formData.client_id);
-    formDataToSend.append('invoice_number', formData.invoice_number);
-    formDataToSend.append('generated_date', formData.generated_date);
-    formDataToSend.append('total_amount', formData.total_amount);
-    formDataToSend.append('status', formData.status);
-    formDataToSend.append('invoice_item_id', formData.invoice_item_id);
+    // const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
+    // const formDataToSend = new FormData();
+    // formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
+    // formDataToSend.append('client_id', formData.client_id);
+    // formDataToSend.append('invoice_number', formData.invoice_number);
+    // formDataToSend.append('generated_date', formData.generated_date);
+    // formDataToSend.append('total_amount', formData.total_amount);
+    // formDataToSend.append('status', formData.status);
+    // formDataToSend.append('invoice_item_id', formData.invoice_item_id);
 
     // const pdfformdata = {
     //   ...formData,
     // invoice_pdf:formDataToSend.toString()
     // }
     axios
-      .post(`${base_url}/client/invoice/`, formDataToSend, {
+      .post(`${base_url}/client/invoice/`, formData, {
         // headers: {
         //   'Content-Type': 'multipart/form-data'
         // }
@@ -316,6 +317,16 @@ function Project(props) {
     console.log(invoice, "888888888");
     setInvoiceData(invoice);
     setIsInvoiceModalOpen(true);
+  };
+
+
+  const ViewPdf = (invoice_id) => {
+    getinvoice____(invoice_id);
+    // const invoice = tableData.find((item) => item.invoice_item_id === id);
+    setIsInvoiceModalOpen(true);
+    setInvoiceData(invoice);
+    // console.log(invoice_id, "data by abu Qatata bhai");
+  
   };
 
   const handleCloseInvoiceModal = () => {
@@ -614,6 +625,7 @@ function Project(props) {
               })
               .map((row, index) => (
                 <TableRow
+                
                   key={index}
                   sx={{
                     m: 5,
@@ -646,7 +658,7 @@ function Project(props) {
                   <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
                     <Button variant="standard"
                       sx={{ textTransform: 'none', "&:hover": { color: "black", backgroundColor: "#53B789" }, }}
-                      onClick={() => handleInvoiceClick(row.id)}>
+                      onClick={() => ViewPdf(row.invoice_id)}>
                       View Invoice
                     </Button>
                   </TableCell>
@@ -707,17 +719,17 @@ function Project(props) {
               <h2 style={styles.invoiceHeaderH2}>Tax Invoice</h2>
               <div className="invoice-details" style={styles.invoiceDetails}>
                 <div style={{ width: '60%' }}>
-                  <div>Invoice No.: {invoice.invoiceNo}</div>
-                  <div>Invoice Date: {invoice.invoiceDate}</div>
-                  <div>Due Date: {invoice.dueDate}</div>
-                  <div>State: {invoice.state}</div>
+                  <div>Invoice No.: {invoice.invoice_number}</div>
+                  <div>Invoice Date: {invoice.generated_date}</div>
+                  <div>Due Date: {invoice.generated_date}</div>
+                  <div>State: {invoice.client_address}</div>
                 </div>
                 <div style={{ width: '40%' }}>
-                  <div>GSTIN/UIN: {invoice.gstin}</div>
-                  <div>Ref. No. & Date: {invoice.refNo}</div>
-                  <div>Buyer Order No. & Date: {invoice.buyerOrderNo}</div>
-                  <div>Delivery Note: {invoice.deliveryNote}</div>
-                  <div>Destination: {invoice.destination}</div>
+                  <div>GSTIN/UIN: {invoice.client_pincode}</div>
+                  <div>Ref. No. & Date: {invoice.client_pincode}</div>
+                  <div>Buyer Order No. & Date: {invoice.client_pincode}</div>
+                  <div>Delivery Note: {invoice.client_pincode}</div>
+                  <div>Destination: {invoice.client_pincode}</div>
                 </div>
               </div>
             </div>
@@ -726,16 +738,16 @@ function Project(props) {
               <h2 style={{ textAlign: 'center' }}>Buyer (Bill to Party)</h2>
               <div className="buyer-details">
                 <div style={{ width: '60%' }}>
-                  <div>Name: {invoice.buyer.name}</div>
-                  <div>Address: {invoice.buyer.address}</div>
+                  <div>Name: {invoice.client_name}</div>
+                  <div>Address: {invoice.client_address}</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>City: {invoice.buyer.city}</div>
-                    <div>PIN: {invoice.buyer.pin}</div>
-                    <div>State: {invoice.buyer.state}</div>
+                    <div>City: {invoice.client_address}</div>
+                    <div>PIN: {invoice.client_pincode}</div>
+                    <div>State: {invoice.client_address}</div>
                   </div>
                 </div>
                 <div style={{ width: '40%' }}>
-                  <div>GSTIN/UIN: {invoice.buyer.gstin}</div>
+                  <div>GSTIN/UIN: {invoice.client_address}</div>
                 </div>
               </div>
             </div>
@@ -753,24 +765,24 @@ function Project(props) {
                 </tr>
               </thead>
               <tbody style={styles.invoiceTableTd}>
-                {invoice.items.map((item, index) => (
+                {invoice.invoice_item_id.map((item, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{item.description}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.rate}</td>
-                    <td>{item.taxableValue}</td>
-                    <td>{item.igst}</td>
-                    <td>{(item.taxableValue * item.igst / 100).toFixed(2)}</td>
-                    <td>{(item.taxableValue + (item.taxableValue * item.igst / 100)).toFixed(2)}</td>
+                    <td>{item.project_name}</td>
+                    <td>{item.tax_id}</td>
+                    <td>{item.item_price}</td>
+                    <td>{item.tax_amount}</td>
+                    <td>{item.tax_rate}</td>
+                    <td>{(item.tax_amount)}</td>
+                    <td>{(item.tax_amount)}</td>
                   </tr>
                 ))}
                 <tr>
                   <td colSpan="2" style={{ textAlign: 'center', fontWeight: 'bold' }}>Total</td>
-                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.totalQuantity}</td>
-                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.totalTaxableValue}</td>
-                  <td style={{ fontWeight: 'bold' }}>{invoice.totalIGST}</td>
-                  <td style={{ fontWeight: 'bold' }}>Rs {calculateTotalAmount()}</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_rate}</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>{invoice.total_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>Rs {invoice.total_amount}</td>
                 </tr>
               </tbody>
             </table>
