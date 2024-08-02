@@ -74,5 +74,12 @@
       "role_id": "cs450",
       "id": "e3dc"
   }],
-  "company":[]
+  "dashboard":[{
+    "id":"1",
+    "activity":"Dashboard",
+    "sales":"45",
+    "income":"560000",
+    "projects":"40",
+    "clients":"25"
+  }]
 }

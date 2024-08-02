@@ -11,29 +11,26 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import base_url from "../src/utils/API";
-export default function Signupform({setOpen}) {
+export default function Signupform() {
   const { register, handleSubmit, reset } = useForm();
-  const navigate =useNavigate()
+  const navigate = useNavigate()
 
-  const onSubmit = async (formData) => {
-    try {
-      await axios.post(
-        `${base_url}/auth_user/user/`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json", 
-          },
-        }
-      );
+  const onSubmit = (formData) => {
+    axios.post(`${base_url}/auth_user/user/`,
+      formData, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then((response) => {
       alert("User registered successfully");
-      setOpen(false)
       reset();
-      navigate('/signin')
-    } catch (error) {
+      navigate('/')
+
+    }).catch((error) => {
+
       console.log("error");
       alert("An error occurred while registering");
-    }
+    })
   };
   return (
     <>
@@ -92,7 +89,7 @@ export default function Signupform({setOpen}) {
             type="text"
             placeholder="Enter Your Contact Number"
             {...register("contact", {
-              required: true,
+              required: "contact number is required",
               pattern: {
                 value: /^\+91\d{10}$/,
                 message: "Contact number must be in the format +91XXXXXXXXXX",
