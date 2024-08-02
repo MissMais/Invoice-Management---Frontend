@@ -68,7 +68,6 @@ function Project(props) {
     getData();
     getclient();
     getDataMultiInvoiceItems();
-    getCompanyDetails();
   }, []);
 
   const getDataMultiInvoiceItems = async () => {
@@ -320,6 +319,7 @@ function Project(props) {
 
   const ViewPdf = (invoice_id) => {
     getinvoice____(invoice_id);
+    getCompanyDetails();
     // const invoice = tableData.find((item) => item.invoice_item_id === id);
     setIsInvoiceModalOpen(true);
     setInvoiceData(invoice);
