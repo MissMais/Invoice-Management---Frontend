@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Input,
   Box,
@@ -31,6 +31,8 @@ import Select from "@mui/material/Select";
 import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 import autoTable from "jspdf-autotable";
+import { useReactToPrint } from 'react-to-print';
+import html2canvas from 'html2canvas';
 // import Bill from "../Bill"
 // import "../"
 
@@ -59,12 +61,13 @@ function Project(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
-  const [CompanyDetails, setCompanyDetails] = useState();
+
+  const [CompanyDetails, setCompanyDetails] = useState()
+  const invoiceRef = useRef();
   useEffect(() => {
     getData();
     getclient();
     getDataMultiInvoiceItems();
-    getinvoice____();
     getCompanyDetails();
   }, []);
 
@@ -99,7 +102,7 @@ function Project(props) {
 
   const getCompanyDetails = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/CompanyDetails");
+      const response = await axios.get(`${base_url}/client/company_details/`);
       console.log(response.data, "Company Details");
       setCompanyDetails(response.data);
     } catch (err) {
@@ -320,7 +323,6 @@ function Project(props) {
     // const invoice = tableData.find((item) => item.invoice_item_id === id);
     setIsInvoiceModalOpen(true);
     setInvoiceData(invoice);
-    // console.log(invoice_id, "data by abu Qatata bhai");
   
   };
 
@@ -329,96 +331,113 @@ function Project(props) {
     setInvoiceData(null);
   };
 
+  // const handleDownloadPDF = () => {
+  //   const doc = new jsPDF();
+  //   doc.text("Invoice Details", 20, 10);
+  //   doc.autoTable({
+  //     startY: 20,
+  //     head: [
+  //       [
+  //         "Customer Name",
+  //         "Invoice Number",
+  //         "Order Number",
+  //         "Invoice Date",
+  //         "Due Date",
+  //       ],
+  //     ],
+  //     body: [
+  //       [
+  //         tableData.client_name,
+  //         invoiceData.client_name,
+  //         invoiceData.order_number,
+  //         invoiceData.invoice_date,
+  //         invoiceData.generated_date,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Description", "Quantity", "Price", "Amount"]],
+  //     body: [
+  //       [
+  //         invoiceData.description,
+  //         invoiceData.quantity,
+  //         invoiceData.price,
+  //         invoiceData.amount,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Notes"]],
+  //     body: [[invoiceData.notes]],
+  //   });
+  //   doc.save("invoice.pdf");
+  // };
+
+
   const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    console.log(doc.PDFObject);
-    doc.text("Invoice Details", 20, 10);
-    doc.autoTable({
-      startY: 20,
-      head: [
-        [
-          "Customer Name",
-          "Invoice Number",
-          "Order Number",
-          "Invoice Date",
-          "Due Date",
-        ],
-      ],
-      body: [
-        [
-          tableData.client_name,
-          invoiceData.client_name,
-          invoiceData.order_number,
-          invoiceData.invoice_date,
-          invoiceData.generated_date,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Description", "Quantity", "Price", "Amount"]],
-      body: [
-        [
-          invoiceData.description,
-          invoiceData.quantity,
-          invoiceData.price,
-          invoiceData.amount,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Notes"]],
-      body: [[invoiceData.notes]],
-    });
-    doc.save("invoice.pdf");
+    const input = invoiceRef.current;
+    html2canvas(input)
+      .then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'PNG', 0, 0);
+        pdf.save('invoice.pdf');
+      });
   };
 
-  const handlePrintPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Invoice Details", 20, 10);
-    doc.autoTable({
-      startY: 20,
-      head: [
-        [
-          "Customer Name",
-          "Invoice Number",
-          "Order Number",
-          "Invoice Date",
-          "Due Date",
-        ],
-      ],
-      body: [
-        [
-          invoiceData.client_name,
-          invoiceData.invoice_number,
-          invoiceData.order_number,
-          invoiceData.invoice_date,
-          invoiceData.generated_date,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Description", "Quantity", "Price", "Amount"]],
-      body: [
-        [
-          invoiceData.description,
-          invoiceData.quantity,
-          invoiceData.price,
-          invoiceData.amount,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Notes"]],
-      body: [[invoiceData.notes]],
-    });
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-  };
+
+  const handlePrintPDF = useReactToPrint({
+    content: () => invoiceRef.current,
+    documentTitle: 'invoice',
+    onAfterPrint: () => alert('Print successful'),
+  });
+  // const handlePrintPDF = () => {
+  //   const doc = new jsPDF();
+  //   doc.text("Invoice Details", 20, 10);
+  //   doc.autoTable({
+  //     startY: 20,
+  //     head: [
+  //       [
+  //         "Customer Name",
+  //         "Invoice Number",
+  //         "Order Number",
+  //         "Invoice Date",
+  //         "Due Date",
+  //       ],
+  //     ],
+  //     body: [
+  //       [
+  //         invoiceData.client_name,
+  //         invoiceData.invoice_number,
+  //         invoiceData.order_number,
+  //         invoiceData.invoice_date,
+  //         invoiceData.generated_date,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Description", "Quantity", "Price", "Amount"]],
+  //     body: [
+  //       [
+  //         invoiceData.description,
+  //         invoiceData.quantity,
+  //         invoiceData.price,
+  //         invoiceData.amount,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Notes"]],
+  //     body: [[invoiceData.notes]],
+  //   });
+  //   const blob = doc.output("blob");
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url);
+  // };
 
   //  if (!invoice) {
   //                return (<div>Loading...</div>)
@@ -899,26 +918,30 @@ function Project(props) {
                 color="primary"
                 onClick={handlePrintPDF}
               >
-                Print
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleDownloadPDF}
-              >
-                Download PDF
-              </Button>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={handleEditInvoice}
-              >
-                Edit
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
-      )}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePrintPDF}
+                >
+                  Print
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleDownloadPDF}
+                >
+                  Download PDF
+                </Button>
+                {/* <Button
+                  variant="contained"
+                  color="info"
+                  onClick={handleEditInvoice}
+                >
+                  Edit
+                </Button> */}
+              </Box> 
+        </Box>
+      </Modal>)}
     </Box>
   );
 }
