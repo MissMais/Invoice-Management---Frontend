@@ -103,7 +103,7 @@ function Project(props) {
   const getCompanyDetails = async () => {
     try {
       const response = await axios.get(`${base_url}/client/company_details/`);
-      console.log(response.data, "Company Details");
+      // console.log(response.data, "Company Details");
       setCompanyDetails(response.data);
     } catch (err) {
       console.log(err);
