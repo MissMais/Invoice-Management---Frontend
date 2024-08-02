@@ -27,7 +27,6 @@ export default function Signupform() {
       navigate('/')
 
     }).catch((error) => {
-
       console.log("error");
       alert("An error occurred while registering");
     })

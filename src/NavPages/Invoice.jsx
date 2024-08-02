@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Input,
   Box,
@@ -30,6 +30,11 @@ import base_url from "../utils/API";
 import Select from "@mui/material/Select";
 import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
+import autoTable from "jspdf-autotable";
+import { useReactToPrint } from 'react-to-print';
+import html2canvas from 'html2canvas';
+// import Bill from "../Bill"
+// import "../"
 
 function Project(props) {
   const initialFormData = {
@@ -39,8 +44,6 @@ function Project(props) {
     total_amount: "",
     status: "",
     invoice_item_id: [],
-    // invoice_pdf: "", 
-
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -57,7 +60,10 @@ function Project(props) {
   const [Option, setOption] = useState([]);
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
+  const [invoice, setInvoice] = useState(null);
 
+  const [CompanyDetails, setCompanyDetails] = useState()
+  const invoiceRef = useRef();
   useEffect(() => {
     getData();
     getclient();
@@ -82,15 +88,6 @@ function Project(props) {
       console.error("Error fetching data:", err);
     }
   };
-
-  const getclient = async () => {
-    try {
-      const response = await axios.get(`${base_url}/client/client/`);
-      setclient(response.data);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
-  };
   const getData = async () => {
     try {
       const response = await axios.get(`${base_url}/client/invoice/`);
@@ -102,27 +99,64 @@ function Project(props) {
     }
   };
 
+  const getCompanyDetails = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/company_details/`);
+      // console.log(response.data, "Company Details");
+      setCompanyDetails(response.data);
+    } catch (err) {
+      console.log(err);
+      console.error("Error fetching data:", err);
+    }
+  };
+
+  const getclient = async () => {
+    try {
+      const response = await axios.get(`${base_url}/client/client/`);
+      setclient(response.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+
+  const getinvoice____ = async (invoice_id) => {
+    try {
+
+      const response = await axios.get(`${base_url}/client/invoice/?invoice_id=${invoice_id}`);
+      setInvoice(response.data);
+    } catch (err) {
+      console.error("There was an error fetching the invoice data!", error);
+    }
+  };
+
+  // if (!invoice) {
+  //   // return <div>Loading...</div>;
+  //   return
+  // }
+
+  // const calculateTotalAmount = () => {
+  //   return invoice.items.reduce((total, item) => total + item.tax_amount + (item.tax_amount * item.tax_rate / 100), 0).toFixed(2);
+  // };
   function postDataToServer(values) {
-    const pdfFile = new Blob([jsPDF], { type: 'application/pdf' }); 
-        const formDataToSend = new FormData();
-        formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
-        formDataToSend.append('client_id',formData.client_id);
-        formDataToSend.append('invoice_number',formData.invoice_number);
-        formDataToSend.append('generated_date',formData.generated_date);
-        formDataToSend.append('total_amount',formData.total_amount);
-        formDataToSend.append('status',formData.status);
-        formDataToSend.append('invoice_item_id',formData.invoice_item_id);
-        
+    // const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
+    // const formDataToSend = new FormData();
+    // formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
+    // formDataToSend.append('client_id', formData.client_id);
+    // formDataToSend.append('invoice_number', formData.invoice_number);
+    // formDataToSend.append('generated_date', formData.generated_date);
+    // formDataToSend.append('total_amount', formData.total_amount);
+    // formDataToSend.append('status', formData.status);
+    // formDataToSend.append('invoice_item_id', formData.invoice_item_id)
     // const pdfformdata = {
-    //   ...formData,
-    // invoice_pdf:formDataToSend.toString()
-    // }
+    //   ...(formData + formDataToSend)
+    //   // invoice_pdf:formDataToSend.toString()
+    // };
     axios
-      .post(`${base_url}/client/invoice/`, formDataToSend , {
-            // headers: {
-            //   'Content-Type': 'multipart/form-data'
-            // }
-          })
+      .post(`${base_url}/client/invoice/`, formData, {
+        // headers: {
+        //   'Content-Type': 'multipart/form-data'
+        // }
+      })
       .then((res) => {
         console.log(res.data);
         getData();
@@ -194,12 +228,12 @@ function Project(props) {
 
     if (name === "invoice_number") {
       const pattern = /^[A-Z]{2}\/\d{4}\/\d{2}-\d{2}$/;
-      const trimmedValue = value.trim(); 
+      const trimmedValue = value.trim();
 
       if (trimmedValue && !pattern.test(trimmedValue)) {
         setError("ENTER IN THIS FORMAT: XX/0000/00-00");
       } else {
-        setError(""); 
+        setError("");
       }
     }
   };
@@ -229,14 +263,13 @@ function Project(props) {
       setTableData(updatedData);
     } else {
       if (!error) {
-         postDataToServer();
+        postDataToServer();
         setTableData([...tableData, { ...formData, id: tableData.length + 1 }]);
-        
-        
-        const pdfFile = new Blob([jsPDF], { type: 'application/pdf' }); 
+
+        const pdfFile = new Blob([jsPDF], { type: "application/pdf" });
         // const formDataToSend = new FormData();
         // formData.append('invoice_pdf', pdfFile, 'invoice.pdf');
-  
+
         // try {
         //   const response = await axios.post(`${base_url}/client/invoice/`, formData, {
         //     headers: {
@@ -254,7 +287,7 @@ function Project(props) {
     setFormData(initialFormData);
     handleCloseModal();
   };
-  
+
   const handleEdit = (index) => {
     setFormData(tableData[index]);
     setEditMode(true);
@@ -283,100 +316,133 @@ function Project(props) {
     setIsInvoiceModalOpen(true);
   };
 
+
+  const ViewPdf = (invoice_id) => {
+    getinvoice____(invoice_id);
+    getCompanyDetails();
+    // const invoice = tableData.find((item) => item.invoice_item_id === id);
+    setIsInvoiceModalOpen(true);
+    setInvoiceData(invoice);
+  
+  };
+
   const handleCloseInvoiceModal = () => {
     setIsInvoiceModalOpen(false);
     setInvoiceData(null);
   };
 
+  // const handleDownloadPDF = () => {
+  //   const doc = new jsPDF();
+  //   doc.text("Invoice Details", 20, 10);
+  //   doc.autoTable({
+  //     startY: 20,
+  //     head: [
+  //       [
+  //         "Customer Name",
+  //         "Invoice Number",
+  //         "Order Number",
+  //         "Invoice Date",
+  //         "Due Date",
+  //       ],
+  //     ],
+  //     body: [
+  //       [
+  //         tableData.client_name,
+  //         invoiceData.client_name,
+  //         invoiceData.order_number,
+  //         invoiceData.invoice_date,
+  //         invoiceData.generated_date,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Description", "Quantity", "Price", "Amount"]],
+  //     body: [
+  //       [
+  //         invoiceData.description,
+  //         invoiceData.quantity,
+  //         invoiceData.price,
+  //         invoiceData.amount,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Notes"]],
+  //     body: [[invoiceData.notes]],
+  //   });
+  //   doc.save("invoice.pdf");
+  // };
+
+
   const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Invoice Details", 20, 10);
-    doc.autoTable({
-      startY: 20,
-      head: [
-        [
-          "Customer Name",
-          "Invoice Number",
-          "Order Number",
-          "Invoice Date",
-          "Due Date",
-        ],
-      ],
-      body: [
-        [
-          tableData.client_name,
-          invoiceData.client_name,
-          invoiceData.order_number,
-          invoiceData.invoice_date,
-          invoiceData.generated_date,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Description", "Quantity", "Price", "Amount"]],
-      body: [
-        [
-          invoiceData.description,
-          invoiceData.quantity,
-          invoiceData.price,
-          invoiceData.amount,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Notes"]],
-      body: [[invoiceData.notes]],
-    });
-    doc.save("invoice.pdf");
+    const input = invoiceRef.current;
+    html2canvas(input)
+      .then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'PNG', 0, 0);
+        pdf.save('invoice.pdf');
+      });
   };
 
-  const handlePrintPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Invoice Details", 20, 10);
-    doc.autoTable({
-      startY: 20,
-      head: [
-        [
-          "Customer Name",
-          "Invoice Number",
-          "Order Number",
-          "Invoice Date",
-          "Due Date",
-        ],
-      ],
-      body: [
-        [
-          invoiceData.client_name,
-          invoiceData.invoice_number,
-          invoiceData.order_number,
-          invoiceData.invoice_date,
-          invoiceData.generated_date,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Description", "Quantity", "Price", "Amount"]],
-      body: [
-        [
-          invoiceData.description,
-          invoiceData.quantity,
-          invoiceData.price,
-          invoiceData.amount,
-        ],
-      ],
-    });
-    doc.autoTable({
-      startY: doc.previousAutoTable.finalY + 10,
-      head: [["Notes"]],
-      body: [[invoiceData.notes]],
-    });
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-  };
+
+  const handlegetPDF = useReactToPrint({
+    content: () => invoiceRef.current,
+    documentTitle: 'invoice',
+    onAfterPrint: () => alert('Print successful'),
+  });
+  // const handlePrintPDF = () => {
+  //   const doc = new jsPDF();
+  //   doc.text("Invoice Details", 20, 10);
+  //   doc.autoTable({
+  //     startY: 20,
+  //     head: [
+  //       [
+  //         "Customer Name",
+  //         "Invoice Number",
+  //         "Order Number",
+  //         "Invoice Date",
+  //         "Due Date",
+  //       ],
+  //     ],
+  //     body: [
+  //       [
+  //         invoiceData.client_name,
+  //         invoiceData.invoice_number,
+  //         invoiceData.order_number,
+  //         invoiceData.invoice_date,
+  //         invoiceData.generated_date,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Description", "Quantity", "Price", "Amount"]],
+  //     body: [
+  //       [
+  //         invoiceData.description,
+  //         invoiceData.quantity,
+  //         invoiceData.price,
+  //         invoiceData.amount,
+  //       ],
+  //     ],
+  //   });
+  //   doc.autoTable({
+  //     startY: doc.previousAutoTable.finalY + 10,
+  //     head: [["Notes"]],
+  //     body: [[invoiceData.notes]],
+  //   });
+  //   const blob = doc.output("blob");
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url);
+  // };
+
+  //  if (!invoice) {
+  //                return (<div>Loading...</div>)
+
+  //                       }
 
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
@@ -455,7 +521,7 @@ function Project(props) {
               name="invoice_number"
               value={formData.invoice_number}
               onChange={handleChange}
-              error={!!error} 
+              error={!!error}
               placeholder="XX/0000/00-00"
               inputProps={{ maxLength: 13 }}
             />
@@ -557,7 +623,7 @@ function Project(props) {
                 Invoice Items
                 </TableCell> */}
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  Details
+                Details
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Action
@@ -574,6 +640,7 @@ function Project(props) {
               })
               .map((row, index) => (
                 <TableRow
+                
                   key={index}
                   sx={{
                     m: 5,
@@ -582,7 +649,7 @@ function Project(props) {
                     "&:hover": { backgroundColor: "#dcf0e7" },
                   }}
                 >
-                  <TableCell sx={{ textAlign: "center"}}>
+                  <TableCell sx={{ textAlign: "center" }}>
                     {row.invoice_id}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
@@ -603,10 +670,12 @@ function Project(props) {
                   {/* <TableCell sx={{ textAlign: "center" }}>
                     {row.invoice_item_id}
                   </TableCell> */}
-                  <TableCell sx={{ textAlign: "center", cursor: "pointer"  }}>
+                  <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
                     <Button variant="standard"
-                    sx={{textTransform: 'none',"&:hover": { color: "black", backgroundColor: "#53B789" }, }}
-                    onClick={() => handleInvoiceClick(row.id)}>
+                      sx={{ textTransform: 'none', "&:hover": { color: "black", backgroundColor: "#53B789" }, }}
+                      onClick={() => ViewPdf(row.invoice_id)}>
+                    
+
                       View Invoice
                     </Button>
                   </TableCell>
@@ -631,72 +700,185 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
+      {invoice && (<Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
         <Box
           sx={{
             flexDirection: "column",
             position: "absolute",
-            top: "60%",
+            top: "50%",
+            bottom:"10%",
             left: "60%",
             transform: "translate(-50%, -50%)",
-            width: 900,
-            height: 450,
+            width: "100%",
+            height: '100%',
             bgcolor: "background.paper",
             border: "3px solid #455a64",
             boxShadow: 24,
             p: 4,
             borderRadius: 4,
+            overflow:"scroll",
           }}
-        >
-          <Typography id="modal-title" component="h2">
-            Invoice Details
-          </Typography>
-          {invoiceData && (
-            <>
-              <Typography variant="body1">
-                Customer Name: {invoiceData.customer_name}
-              </Typography>
-              <Typography variant="body1">
-                Invoice Number: {invoiceData.invoice_number}
-              </Typography>
-              <Typography variant="body1">
-                Order Number: {invoiceData.order_number}
-              </Typography>
-              <Typography variant="body1">
-                Invoice Date: {invoiceData.invoice_date}
-              </Typography>
-              <Typography variant="body1">
-                Due Date: {invoiceData.generated_date}
-              </Typography>
-              <Typography variant="body1">
-                Notes: {invoiceData.notes}
-              </Typography>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>{invoiceData.description}</TableCell>
-                    <TableCell>{invoiceData.quantity}</TableCell>
-                    <TableCell>{invoiceData.price}</TableCell>
-                    <TableCell>{invoiceData.amount}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <Box
+        >        
+          <div className="invoice" style={styles.invoice_table
+          }>
+            <div className="head" style={styles.head}>
+              <h1 style={styles.headH1}>AFUCENT TECHNOLOGIES</h1>
+            </div>
+            <div className="invoice-logo"style={styles.invoiceLogo}>
+              <img style={{maxWidth: '100px'}} src="logo.png" alt="Invoice logo" />
+            </div>
+            <div className="invoice-address" style={styles.invoiceAddress}>
+              <p>4th Floor, New Janpath Complex<br />
+                9 Ashok Marg, Hazratganj, LUCKNOW<br />
+                Uttar Pradesh - 226001</p>
+            </div>
+            <div className="invoice-header" style={styles.invoiceHeader}>
+              <h2 style={styles.invoiceHeaderH2}>Tax Invoice</h2>
+              <div className="invoice-details" style={styles.invoiceDetails}>
+                <div style={{ width: '60%' }}>
+                  <div>Invoice No.: {invoice.invoice_number}</div>
+                  <div>Invoice Date: {invoice.generated_date}</div>
+                  <div>Due Date: {invoice.generated_date}</div>
+                  <div>State: {invoice.client_address}</div>
+                </div>
+                <div style={{ width: '40%' }}>
+                  <div>GSTIN/UIN: {invoice.client_pincode}</div>
+                  <div>Ref. No. & Date: {invoice.client_pincode}</div>
+                  <div>Buyer Order No. & Date: {invoice.client_pincode}</div>
+                  <div>Delivery Note: {invoice.client_pincode}</div>
+                  <div>Destination: {invoice.client_pincode}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="invoice-buyer" style={styles.invoiceBuyer}>
+              <h2 style={{ textAlign: 'center' }}>Buyer (Bill to Party)</h2>
+              <div className="buyer-details">
+                <div style={{ width: '60%' }}>
+                  <div>Name: {invoice.client_name}</div>
+                  <div>Address: {invoice.client_address}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div>City: {invoice.client_address}</div>
+                    <div>PIN: {invoice.client_pincode}</div>
+                    <div>State: {invoice.client_address}</div>
+                  </div>
+                </div>
+                <div style={{ width: '40%' }}>
+                  <div>GSTIN/UIN: {invoice.client_address}</div>
+                </div>
+              </div>
+            </div>
+            <table className="invoice-table" style={styles.invoiceTable}>
+              <thead style={styles.invoiceTableTh}>
+                <tr>
+                  <th>SN</th>
+                  <th>Product Description</th>
+                  <th>Qty</th>
+                  <th>Rate Rs</th>
+                  <th>Taxable Value</th>
+                  <th>%</th>
+                  <th>IGST</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody style={styles.invoiceTableTd}>
+                {invoice.invoice_item_id.map((item, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.project_name}</td>
+                    <td>{item.tax_id}</td>
+                    <td>{item.item_price}</td>
+                    <td>{item.tax_amount}</td>
+                    <td>{item.tax_rate}</td>
+                    <td>{(item.tax_amount)}</td>
+                    <td>{(item.tax_amount)}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan="2" style={{ textAlign: 'center', fontWeight: 'bold' }}>Total</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_rate}</td>
+                  <td colSpan="2" style={{ fontWeight: 'bold' }}>{invoice.invoice_item_id.tax_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>{invoice.total_amount}</td>
+                  <td style={{ fontWeight: 'bold' }}>Rs {invoice.total_amount}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="total-words" style={styles.totalWords}>
+              <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
+              <p>{invoice.amountInWords}</p>
+            </div>
+            <div className="amount-summary" style={styles.amountSummary}>
+              {/*
+        <div><u>IGST:</u> {invoice.totalIGST}</div>
+        <div><u>Total Tax:</u> {invoice.totalTax}</div>
+        <div><u>Total Amount with Tax:</u> {invoice.totalAmountWithTax}</div>
+        <div><u>Net Amount Payable in Rs.:</u> {invoice.netAmountPayable}</div>
+        <div><u>Advance Amount Paid Rs.:</u> {invoice.advanceAmountPaid}</div>
+        <div><u>Balance Amount Payable Rs.:</u> {invoice.balanceAmountPayable}</div> */}
+                  <table className="invoice-table-amount">
+                    <tbody>
+                      <tr>
+                        <td>
+                          Total Amount Before Tax:{" "}
+                          {invoice.totalAmountBeforeTax}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>IGST: {invoice.totalIGST}</td>
+                      </tr>
+                      <tr>
+                        <td>Total Tax: {invoice.totalTax}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Total Amount with Tax: {invoice.totalAmountWithTax}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Net Amount Payable in Tax: {invoice.netAmountPayable}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Advance Amount Paid Rs.: {invoice.advanceAmountPaid}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Balance Amount Payable Rs.:{" "}
+                          {invoice.balanceAmountPayable}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+            <div className="bank-details" style={styles.bankDetails}>
+              <h5 style={{ textAlign: 'center', fontWeight: 'bold' }}><u>Bank Details</u></h5>
+              <div><u>Name:</u> {CompanyDetails.company_name}</div>
+              <div><u>A/c No.:</u> {CompanyDetails.account_number}</div>
+              <div><u>Bank & IFSC:</u> {CompanyDetails.bank_name} - {CompanyDetails.ifsc_code}</div>
+              <div><u>Branch:</u> {CompanyDetails.branch_name}</div>
+            </div>
+            <div className="declaration" style={styles.declaration}>
+              <h5 style={{ textAlign: 'center' }}><b><u>Declaration</u></b></h5>
+              <p style={styles.declarationP}>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.</p>
+            </div>
+            <div className="signature" style={styles.signature}>
+              <h5 style={{ textAlign: 'center' }}><b>FOR</b></h5>
+              <img style={styles.signatureImg} src={CompanyDetails.digital_seal} alt="Signature" />
+              <img style={styles.signatureImg} src={CompanyDetails.digital_signature} alt="Seal" />
+              <p>Authorized Signatory</p>
+            </div>
+          </div>
+          <Box
                 sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
               >
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handlePrintPDF}
+                  // onClick={handlePrintPDF}
                 >
                   Print
                 </Button>
@@ -707,20 +889,150 @@ function Project(props) {
                 >
                   Download PDF
                 </Button>
-                <Button
+                {/* <Button
                   variant="contained"
                   color="info"
                   onClick={handleEditInvoice}
                 >
                   Edit
-                </Button>
-              </Box>        
-            </>
-          )}
+                </Button> */}
+              </Box> 
         </Box>
-      </Modal>
+      </Modal>)}
     </Box>
   );
 }
 
+const styles = {
+  invoice_table: {
+    fontFamily: "Arial, sans-serif",
+    margin: "20px auto",
+    border: "2px solid black",
+    width: "80%",
+    display: "grid",
+    gridTemplateAreas: `
+"header header"
+"logo company-address"
+"tax-invoice tax-invoice"
+"buyer-details buyer-details"
+"items-table items-table"
+"total-words amount-summary"
+"bank-details amount-summary"
+"declaration signature"
+`,
+    gridGap: "10px",
+    padding: "4px",
+    marginBottom: 10,
+  },
+  head: {
+    gridArea: "header",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "#123270",
+    color: "aliceblue",
+    padding: "10px",
+  },
+  headH1: {
+    fontFamily: "'Times New Roman', Times, serif",
+    margin: 0,
+  },
+  invoiceLogo: {
+    gridArea: "logo",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  invoiceLogoImg: {
+    maxWidth: "100px",
+  },
+  invoiceAddress: {
+    gridArea: "company-address",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    textAlign: "right",
+  },
+  invoiceHeader: {
+    gridArea: "tax-invoice",
+    border: "1px solid black",
+    margin: 0,
+    fontWeight: "bolder",
+    padding: "10px",
+  },
+  invoiceHeaderH2: {
+    fontSize: "21px",
+    margin: "5px 0",
+    fontWeight: "bolder",
+    textDecoration: "underline",
+    textAlign: "center",
+  },
+  invoiceDetails: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "10px",
+    lineHeight: "33px",
+  },
+  invoiceBuyer: {
+    gridArea: "buyer-details",
+    border: "1px solid black",
+    margin: 0,
+    fontWeight: "bolder",
+    padding: "10px",
+  },
+  invoiceTable: {
+    gridArea: "items-table",
+    width: "100%",
+    borderCollapse: "collapse",
+    marginTop: "20px",
+  },
+  invoiceTableTh: {
+    border: "1px solid #000",
+    padding: "8px",
+    textAlign: "left",
+  },
+  invoiceTableTd: {
+    border: "1px solid #000",
+    padding: "8px",
+    textAlign: "left",
+  },
+  totalWords: {
+    gridArea: "total-words",
+    fontWeight: "bold",
+    padding: "10px",
+    width: "100%",
+  },
+  amountSummary: {
+    gridArea: "amount-summary",
+    marginTop: "-5px",
+    fontWeight: "bold",
+  },
+  bankDetails: {
+    gridArea: "bank-details",
+    fontWeight: "bold",
+    border: "1px solid black",
+    padding: "10px",
+    width: "70%",
+  },
+  declaration: {
+    gridArea: "declaration",
+    padding: "10px",
+    textAlign: "left",
+    display: "flex",
+    flexDirection: "column",
+    width: "inherit",
+  },
+  declarationP: {
+    margin: "10px 0",
+  },
+  signature: {
+    gridArea: "signature",
+    padding: "10px",
+  },
+  signatureImg: {
+    maxWidth: "100px",
+    marginLeft: "10px",
+  },
+};
 export default Project;

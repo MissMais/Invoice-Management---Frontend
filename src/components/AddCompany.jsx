@@ -54,7 +54,7 @@ export default function AddCompany() {
     const fetchData = () => {
         axios.get(`${base_url}/client/company_details/`)
             .then((response) => {
-                console.log(response.data);
+                console.log("********************",response.data);
                 if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                     setData(response.data);
                     const imageData = response.data[0];
@@ -277,7 +277,7 @@ export default function AddCompany() {
                                 </Box>
                             ))
                         ) : (
-                            <Button variant="outlined" onClick={handleAdd}>Add</Button>
+                            <Button sx={{marginLeft:38}}variant="outlined" onClick={handleAdd}>Add Company details</Button>
                         )} {
                             (open || edit) && (
                                 <Modal

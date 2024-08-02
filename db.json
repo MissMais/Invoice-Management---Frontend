@@ -74,6 +74,7 @@
       "role_id": "cs450",
       "id": "e3dc"
   }],
+
   "dashboard":[{
     "id":"1",
     "activity":"Dashboard",
@@ -82,4 +83,60 @@
     "projects":"40",
     "clients":"25"
   }]
+
+  "company":[],
+
+  "invoice": {
+      "invoiceNo": "AF/0004/24-25",
+      "invoiceDate": "03/May/2024",
+      "dueDate": "N/A",
+      "state": "Uttar Pradesh",
+      "buyer": {
+        "name": "DPOIESIS MEDIA NETWORK PRIVATE LIMITED",
+        "address": "Unit A3219, Marathon Futurex",
+        "city": "Mumbai",
+        "pin": "400013",
+        "state": "Maharastra"
+      },
+      "items": [
+        {
+          "description": "AA Consulting Expense (Sandeep)",
+          "quantity": 1,
+          "rate": 400000,
+          "taxableValue": 400000,
+          "igst": 18
+        },
+        {
+          "description": "AA Consulting Expense (Onkar)",
+          "quantity": 1,
+          "rate": 100000,
+          "taxableValue": 100000,
+          "igst": 18
+        },{
+          "description": "AA Consulting Expense (Rahul)",
+          "quantity": 5,
+          "rate":2000,
+          "taxableValue":100000,
+          "igst":220
+        },
+        {
+          "description": "AA Consulting Expense (Rahul)",
+          "quantity": 5,
+          "rate":2000,
+          "taxableValue":100000,
+          "igst":220
+        }
+      ],
+      "totalAmountBeforeTax": 500000,
+      "totalTax": 90000,
+      "totalAmountWithTax": 590000,
+      "amountInWords": "Four Lakhs Sixty One Thousand Two Hundred Seventy Three Only",
+      "bankDetails": {
+        "name": "AFUCENT TECHNOLOGIES",
+        "accountNo": "50200007975158",
+        "bankName": "HDFC Bank",
+        "ifsc": "HDFC0000078",
+        "branch": "M.G. Road, Hazratganj, LUCKNOW"
+      }
+    }
 }
