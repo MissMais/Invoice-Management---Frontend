@@ -62,12 +62,13 @@ function Invoice(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
-  const [CompanyDetails, setCompanyDetails] = useState()
+  const [CompanyDetails, setCompanyDetails] = useState(null);
   const invoiceRef = useRef();
   useEffect(() => {
     getData();
     getclient();
     getDataMultiInvoiceItems();
+    getCompanyDetails();
   }, []);
 
   const getDataMultiInvoiceItems = async () => {
@@ -100,7 +101,6 @@ function Invoice(props) {
   const getCompanyDetails = async () => {
     try {
       const response = await axios.get(`${base_url}/client/company_details/`);
-      // console.log(response.data, "Company Details");
       setCompanyDetails(response.data);
     } catch (err) {
       console.log(err);
@@ -117,39 +117,10 @@ function Invoice(props) {
     }
   };
 
-  const getinvoice____ = async (invoice_id) => {
-    try {
-      const response = await axios.get(
-        `${base_url}/client/invoice/?invoice_id=${invoice_id}`
-      );
-      setInvoice(response.data);
-    } catch (err) {
-      console.error("There was an error fetching the invoice data!", error);
-    }
-  };
-
   function postDataToServer(values) {
-    // const pdfFile = new Blob([jsPDF], { type: 'application/pdf' });
-    // const formDataToSend = new FormData();
-    // formDataToSend.append('invoice_pdf', pdfFile, 'invoice.pdf');
-    // formDataToSend.append('client_id', formData.client_id);
-    // formDataToSend.append('invoice_number', formData.invoice_number);
-    // formDataToSend.append('generated_date', formData.generated_date);
-    // formDataToSend.append('total_amount', formData.total_amount);
-    // formDataToSend.append('status', formData.status);
-    // formDataToSend.append('invoice_item_id', formData.invoice_item_id)
-    // const pdfformdata = {
-    //   ...(formData + formDataToSend)
-    //   // invoice_pdf:formDataToSend.toString()
-    // };
     axios
-      .post(`${base_url}/client/invoice/`, formData, {
-        // headers: {
-        //   'Content-Type': 'multipart/form-data'
-        // }
-      })
+      .post(`${base_url}/client/invoice/`, formData)
       .then((res) => {
-        console.log(res.data);
         getData();
         alert("Invoice Added Successfully");
       })
@@ -183,7 +154,6 @@ function Invoice(props) {
 
   const handleChangeInvoiceMulti = (selectedOption) => {
     setInvoiceItems(selectedOption);
-    console.log(invoiceItems, "ywiudddi");
     setFormData({
       ...formData,
       invoice_item_id: selectedOption.map((o) => o.value),
@@ -274,11 +244,10 @@ function Invoice(props) {
     setIsInvoiceModalOpen(true);
   };
 
-  const ViewPdf = (invoice_id) => {
-    getinvoice____(invoice_id);
-    getCompanyDetails();
+  const ViewPdf = (invoice_data_of_row) => {
+    setInvoice(invoice_data_of_row);
+
     setIsInvoiceModalOpen(true);
-    setInvoiceData(invoice);
   };
 
   const handleCloseInvoiceModal = () => {
@@ -561,9 +530,6 @@ function Invoice(props) {
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Invoice Number
               </TableCell>
-              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Client Name
-              </TableCell> */}
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Generated Date
               </TableCell>
@@ -573,9 +539,6 @@ function Invoice(props) {
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Status
               </TableCell>
-              {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
-                Invoice Items
-                </TableCell> */}
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 Details
               </TableCell>
@@ -609,9 +572,6 @@ function Invoice(props) {
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.invoice_number}
                   </TableCell>
-                  {/* <TableCell sx={{ textAlign: "center" }}>
-                    {row.client_name}
-                  </TableCell> */}
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.generated_date}
                   </TableCell>
@@ -621,9 +581,6 @@ function Invoice(props) {
                   <TableCell sx={{ textAlign: "center" }}>
                     {row.status}
                   </TableCell>
-                  {/* <TableCell sx={{ textAlign: "center" }}>
-                    {row.invoice_item_id}
-                  </TableCell> */}
                   <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
 
                     <Button
@@ -635,7 +592,7 @@ function Invoice(props) {
                           backgroundColor: "#53B789",
                         },
                       }}
-                      onClick={() => ViewPdf(row.invoice_id)}
+                      onClick={() => ViewPdf(row)}
                     >
 
                       View Invoice
@@ -712,7 +669,9 @@ function Invoice(props) {
                     <div>State: {invoice.client_address}</div>
                   </div>
                   <div style={{ width: "40%" }}>
-                    <div>GSTIN/UIN: {invoice.client_pincode}</div>
+                    {CompanyDetails.map((row, company_id) => (
+                      <div>GSTIN/UIN: {row.gst_in}</div>
+                    ))}
                     <div>Ref. No. & Date: {invoice.client_pincode}</div>
                     <div>Buyer Order No. & Date: {invoice.client_pincode}</div>
                     <div>Delivery Note: {invoice.client_pincode}</div>
@@ -740,7 +699,9 @@ function Invoice(props) {
 
                   </div>
                   <div style={{ width: "40%" }}>
-                    <div>GSTIN/UIN: {invoice.client_address}</div>
+                    {CompanyDetails.map((row, company_id) => (
+                      <div>GSTIN/UIN: {row.gst_in}</div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -757,7 +718,7 @@ function Invoice(props) {
                     <th>Total</th>
                   </tr>
                 </thead>
-                {/* <tbody style={styles.invoiceTableTd}>
+                <tbody style={styles.invoiceTableTd}>
                   {invoice.invoice_item_id.map((item, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
@@ -790,7 +751,7 @@ function Invoice(props) {
                       Rs {invoice.total_amount}
                     </td>
                   </tr>
-                </tbody> */}
+                </tbody>
               </table>
               <div className="total-words" style={styles.totalWords}>
                 <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
@@ -835,24 +796,26 @@ function Invoice(props) {
                 </table>
               </div>
 
-              <div className="bank-details" style={styles.bankDetails}>
-                <h5 style={{ textAlign: "center", fontWeight: "bold" }}>
-                  <u>Bank Details</u>
-                </h5>
-                <div>
-                  <u>Name:</u> {CompanyDetails.company_name}
+              {CompanyDetails.map((row, company_id) => (
+                <div className="bank-details" style={styles.bankDetails}>
+                  <h5 style={{ textAlign: "center", fontWeight: "bold" }}>
+                    <u>Bank Details</u>
+                  </h5>
+                  <div>
+                    <u>Name:</u> {row.company_name}
+                  </div>
+                  <div>
+                    <u>A/c No.:</u> {row.account_number}
+                  </div>
+                  <div>
+                    <u>Bank & IFSC:</u> {row.bank_name} - {row.ifsc_code}
+                  </div>
+                  <div>
+                    <u>Branch:</u> {row.branch_name}
+                  </div>
                 </div>
-                <div>
-                  <u>A/c No.:</u> {CompanyDetails.account_number}
-                </div>
-                <div>
-                  <u>Bank & IFSC:</u> {CompanyDetails.bank_name} -{" "}
-                  {CompanyDetails.ifsc_code}
-                </div>
-                <div>
-                  <u>Branch:</u> {CompanyDetails.branch_name}
-                </div>
-              </div>
+              ))}
+
               <div className="declaration" style={styles.declaration}>
                 <h5 style={{ textAlign: "center" }}>
                   <b>
@@ -864,22 +827,24 @@ function Invoice(props) {
                   goods described and that all particulars are true and correct.
                 </p>
               </div>
-              <div className="signature" style={styles.signature}>
-                <h5 style={{ textAlign: "center" }}>
-                  <b>FOR</b>
-                </h5>
-                <img
-                  style={styles.signatureImg}
-                  src={CompanyDetails.digital_seal}
-                  alt="Signature"
-                />
-                <img
-                  style={styles.signatureImg}
-                  src={CompanyDetails.digital_signature}
-                  alt="Seal"
-                />
-                <p>Authorized Signatory</p>
-              </div>
+              {CompanyDetails.map((row, company_id) => (
+                <div className="signature" style={styles.signature}>
+                  <h5 style={{ textAlign: "center" }}>
+                    <b>FOR</b>
+                  </h5>
+                  <img
+                    style={styles.signatureImg}
+                    src={row.digital_seal}
+                    alt="Signature"
+                  />
+                  <img
+                    style={styles.signatureImg}
+                    src={row.digital_signature}
+                    alt="Seal"
+                  />
+                  <p>Authorized Signatory</p>
+                </div>
+              ))}
             </div>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
