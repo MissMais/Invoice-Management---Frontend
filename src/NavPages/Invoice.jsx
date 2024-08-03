@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Input,
   Box,
@@ -31,8 +31,9 @@ import Select from "@mui/material/Select";
 import ReactSelect from "react-select";
 import MenuItem from "@mui/material/MenuItem";
 import autoTable from "jspdf-autotable";
-import { useReactToPrint } from "react-to-print";
-import html2canvas from "html2canvas";
+import { useReactToPrint } from 'react-to-print';
+import html2canvas from 'html2canvas';
+
 // import Bill from "../Bill"
 // import "../"
 
@@ -61,7 +62,6 @@ function Invoice(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
-
   const [CompanyDetails, setCompanyDetails] = useState(null);
   const invoiceRef = useRef();
   useEffect(() => {
@@ -301,18 +301,20 @@ function Invoice(props) {
 
   const handleDownloadPDF = () => {
     const input = invoiceRef.current;
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 0, 0);
-      pdf.save("invoice.pdf");
-    });
+    html2canvas(input)
+      .then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'PNG', 0, 0);
+        pdf.save('invoice.pdf');
+      });
   };
+
 
   const handlegetPDF = useReactToPrint({
     content: () => invoiceRef.current,
-    documentTitle: "invoice",
-    onAfterPrint: () => alert("Print successful"),
+    documentTitle: 'invoice',
+    onAfterPrint: () => alert('Print successful'),
   });
   // const handlePrintPDF = () => {
   //   const doc = new jsPDF();
@@ -555,6 +557,7 @@ function Invoice(props) {
               })
               .map((row, index) => (
                 <TableRow
+                
                   key={index}
                   sx={{
                     m: 5,
@@ -579,6 +582,7 @@ function Invoice(props) {
                     {row.status}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center", cursor: "pointer" }}>
+
                     <Button
                       variant="standard"
                       sx={{
@@ -590,6 +594,7 @@ function Invoice(props) {
                       }}
                       onClick={() => ViewPdf(row)}
                     >
+
                       View Invoice
                     </Button>
                   </TableCell>
@@ -691,6 +696,7 @@ function Invoice(props) {
                       <div>PIN: {invoice.client_pincode}</div>
                       <div>State: {invoice.client_address}</div>
                     </div>
+
                   </div>
                   <div style={{ width: "40%" }}>
                     {CompanyDetails.map((row, company_id) => (
