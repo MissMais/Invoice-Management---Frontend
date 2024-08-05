@@ -1,2 +1,3 @@
-const base_url = "https://70f7-2409-40c4-313-8e8c-34a6-a3c4-74cd-d488.ngrok-free.app"
+
+const base_url = "https://invoice-management-alpha.vercel.app"
 export default base_url

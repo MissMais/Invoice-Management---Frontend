@@ -400,10 +400,8 @@ export default function AddCompany() {
                           fullWidth
                           id="branch_name"
                           name="branch_name"
-
                           value={data.branch_name}
                           onChange={handleChange}
-
                           margin="normal"
                         />
                       </Grid>
