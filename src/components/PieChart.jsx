@@ -69,7 +69,7 @@ const handleChange = (event) => {
     
   return (
     <Box>
-      <FormControl variant="standard" sx={{width:300, marginLeft:26, marginBottom:4}}>
+      <FormControl variant="standard" sx={{width:300, marginLeft:15, marginBottom:4}}>
         
         <InputLabel id="select-label">Choose any option to see data</InputLabel>
         <Select
@@ -86,7 +86,7 @@ const handleChange = (event) => {
           <MenuItem value="Option 5">Option 5</MenuItem>
         </Select>
       </FormControl>
-      <Box width="700px" height="400px" marginLeft={20} >
+      <Box width="350px" height="350px" marginLeft={10} >
         <Pie data={chartData}/>
       </Box>
     </Box>
