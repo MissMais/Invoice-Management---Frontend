@@ -47,6 +47,7 @@ function Project(props) {
 
   const getData = async () => {
     try {
+      axios.defaults.headers.common['ngrok-skip-browser-warning'] ='anyvalue';
       const response = await axios.get(`${base_url}/client/client/`);
       setTableData(response.data);
     } catch (err) {
