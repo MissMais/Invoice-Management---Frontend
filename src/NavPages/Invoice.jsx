@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Input,
   Box,
@@ -33,6 +33,7 @@ import MenuItem from "@mui/material/MenuItem";
 import autoTable from "jspdf-autotable";
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
+import sign_logo from '../assets/sign_logo.jpeg'
 
 // import Bill from "../Bill"
 // import "../"
@@ -80,7 +81,7 @@ function Invoice(props) {
           value: item_invoice.invoice_item_id,
           price: item_invoice.item_price,
           tax_amount: item_invoice.tax_amount,
-          totalAmount: item_invoice.item_price + item_invoice.tax_amount,
+          totalAmount: parseInt(item_invoice.item_price) + parseInt(item_invoice.tax_amount),
         }))
       );
     } catch (err) {
@@ -153,10 +154,19 @@ function Invoice(props) {
   };
 
   const handleChangeInvoiceMulti = (selectedOption) => {
+    const SelOpt = selectedOption.map((o) =>  o.totalAmount)
+    
+    let SumTotal=0;
+    for(let i=0; i<SelOpt.length;i++){
+      SumTotal+=SelOpt[i];
+    }
+    
+    
     setInvoiceItems(selectedOption);
     setFormData({
       ...formData,
       invoice_item_id: selectedOption.map((o) => o.value),
+      total_amount:SumTotal,
     });
   };
 
@@ -299,23 +309,29 @@ function Invoice(props) {
   //   doc.save("invoice.pdf");
   // };
 
+  const handlePrintPDF = useReactToPrint({
+    content: () => invoiceRef.current,
+    documentTitle: 'invoice',
+    onAfterPrint: () => alert('Print successful'),
+  });
+
   const handleDownloadPDF = () => {
     const input = invoiceRef.current;
     html2canvas(input)
       .then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/JPEG');
         const pdf = new jsPDF();
-        pdf.addImage(imgData, 'PNG', 0, 0);
+        pdf.addImage(imgData, 'JPEG', 15, 10, 185, 250);
         pdf.save('invoice.pdf');
       });
   };
 
 
-  const handlegetPDF = useReactToPrint({
-    content: () => invoiceRef.current,
-    documentTitle: 'invoice',
-    onAfterPrint: () => alert('Print successful'),
-  });
+  // const handlegetPDF = useReactToPrint({
+  //   content: () => invoiceRef.current,
+  //   documentTitle: 'invoice',
+  //   onAfterPrint: () => alert('Print successful'),
+  // });
   // const handlePrintPDF = () => {
   //   const doc = new jsPDF();
   //   doc.text("Invoice Details", 20, 10);
@@ -485,6 +501,7 @@ function Invoice(props) {
               name="total_amount"
               value={formData.total_amount}
               onChange={handleChange}
+              disabled
             />
           </FormControl>
           <FormControl sx={{ margin: 2 }}>
@@ -639,14 +656,14 @@ function Invoice(props) {
               overflow: "scroll",
             }}
           >
-            <div className="invoice" style={styles.invoice_table}>
+            <div className="invoice" ref={invoiceRef} style={styles.invoice_table}>
               <div className="head" style={styles.head}>
                 <h1 style={styles.headH1}>AFUCENT TECHNOLOGIES</h1>
               </div>
               <div className="invoice-logo" style={styles.invoiceLogo}>
                 <img
                   style={{ maxWidth: "100px" }}
-                  src="logo.png"
+                  src={sign_logo}
                   alt="Invoice logo"
                 />
               </div>
@@ -829,12 +846,13 @@ function Invoice(props) {
               </div>
               {CompanyDetails.map((row, company_id) => (
                 <div className="signature" style={styles.signature}>
-                  <h5 style={{ textAlign: "center" }}>
+                  <h5 style={{ textAlign: "right" }}>
                     <b>FOR</b>
                   </h5>
                   <img
-                    style={styles.signatureImg}
-                    src={row.digital_seal}
+                    style={styles.sealImg}
+                    // src={row.digital_seal}
+                    src={sign_logo}
                     alt="Signature"
                   />
                   <img
@@ -842,7 +860,7 @@ function Invoice(props) {
                     src={row.digital_signature}
                     alt="Seal"
                   />
-                  <p>Authorized Signatory</p>
+                  {/* <p>Authorized Signatory</p> */}
                 </div>
               ))}
             </div>
@@ -852,7 +870,7 @@ function Invoice(props) {
               <Button
                 variant="contained"
                 color="primary"
-                // onClick={handlePrintPDF}
+                onClick={handlePrintPDF}
               >
                 Print
               </Button>
@@ -897,7 +915,7 @@ const styles = {
 `,
     gridGap: "10px",
     padding: "4px",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   head: {
     gridArea: "header",
@@ -1004,10 +1022,16 @@ const styles = {
   signature: {
     gridArea: "signature",
     padding: "10px",
+    marginLeft: "45px",
+  },
+  sealImg:{
+    maxWidth: "100px",
+    marginLeft: "50px",
   },
   signatureImg: {
-    maxWidth: "100px",
-    marginLeft: "10px",
+    maxWidth: "200px",
+    height:"70px",
+    marginLeft: "50px",
   },
 };
 export default Invoice;
