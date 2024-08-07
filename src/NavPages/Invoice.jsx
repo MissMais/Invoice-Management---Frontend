@@ -257,13 +257,10 @@ function Invoice(props) {
   };
 
   const ViewPdf = (invoice_data_of_row) => {
-    console.log(invoice_data_of_row.total_amount,"abu qatata bhai")
-    
+     
     var converter = require('number-to-words');
     let words = converter.toWords(invoice_data_of_row.total_amount)
-    // setamountto(words)
-    // const amounttoword = invoice_data_of_row.map((o) =>  o.totalAmount)
-    // console.log(amounttoword,"hassan bhai");
+    
     setInvoice(
       {...invoice_data_of_row,
       amountowords : words}
@@ -278,49 +275,7 @@ function Invoice(props) {
     setInvoiceData(null);
   };
 
-  // const handleDownloadPDF = () => {
-  //   const doc = new jsPDF();
-  //   doc.text("Invoice Details", 20, 10);
-  //   doc.autoTable({
-  //     startY: 20,
-  //     head: [
-  //       [
-  //         "Customer Name",
-  //         "Invoice Number",
-  //         "Order Number",
-  //         "Invoice Date",
-  //         "Due Date",
-  //       ],
-  //     ],
-  //     body: [
-  //       [
-  //         tableData.client_name,
-  //         invoiceData.client_name,
-  //         invoiceData.order_number,
-  //         invoiceData.invoice_date,
-  //         invoiceData.generated_date,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Description", "Quantity", "Price", "Amount"]],
-  //     body: [
-  //       [
-  //         invoiceData.description,
-  //         invoiceData.quantity,
-  //         invoiceData.price,
-  //         invoiceData.amount,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Notes"]],
-  //     body: [[invoiceData.notes]],
-  //   });
-  //   doc.save("invoice.pdf");
-  // };
+  
 
   const handlePrintPDF = useReactToPrint({
     content: () => invoiceRef.current,
@@ -341,62 +296,6 @@ function Invoice(props) {
 
 
 
-
-  // const handlegetPDF = useReactToPrint({
-  //   content: () => invoiceRef.current,
-  //   documentTitle: 'invoice',
-  //   onAfterPrint: () => alert('Print successful'),
-  // });
-  // const handlePrintPDF = () => {
-  //   const doc = new jsPDF();
-  //   doc.text("Invoice Details", 20, 10);
-  //   doc.autoTable({
-  //     startY: 20,
-  //     head: [
-  //       [
-  //         "Customer Name",
-  //         "Invoice Number",
-  //         "Order Number",
-  //         "Invoice Date",
-  //         "Due Date",
-  //       ],
-  //     ],
-  //     body: [
-  //       [
-  //         invoiceData.client_name,
-  //         invoiceData.invoice_number,
-  //         invoiceData.order_number,
-  //         invoiceData.invoice_date,
-  //         invoiceData.generated_date,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Description", "Quantity", "Price", "Amount"]],
-  //     body: [
-  //       [
-  //         invoiceData.description,
-  //         invoiceData.quantity,
-  //         invoiceData.price,
-  //         invoiceData.amount,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Notes"]],
-  //     body: [[invoiceData.notes]],
-  //   });
-  //   const blob = doc.output("blob");
-  //   const url = URL.createObjectURL(blob);
-  //   window.open(url);
-  // };
-
-  //  if (!invoice) {
-  //                return (<div>Loading...</div>)
-
-  //                       }
 
   return (
     <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
@@ -892,6 +791,7 @@ function Invoice(props) {
               <Button
                 variant="contained"
                 color="primary"
+                // backgroundColor="green"
                 onClick={handlePrintPDF}
               >
                 Print
