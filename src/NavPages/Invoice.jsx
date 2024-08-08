@@ -35,6 +35,7 @@ import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import sign_logo from '../assets/sign_logo.jpeg'
 import dummy_logo from '../assets/dummy_logo.jpeg'
+import digital_signature from '../assets/digital_signature.jpeg'
 import { ToWords } from 'to-words';
 // import Bill from "../Bill"
 // import "../"
@@ -104,7 +105,8 @@ function Invoice(props) {
   const getCompanyDetails = async () => {
     try {
       const response = await axios.get(`${base_url}/client/company_details/`);
-      setCompanyDetails(response.data);
+      
+      setCompanyDetails(response.data);      
     } catch (err) {
       console.log(err);
       console.error("Error fetching data:", err);
@@ -583,29 +585,37 @@ function Invoice(props) {
                 />
               </div>
               <div className="invoice-address" style={styles.invoiceAddress}>
-                <p>
-                  4th Floor, New Janpath Complex
+                <p style={{textAlign:'end'}}>
+                  {/* 4th Floor, New Janpath Complex
                   <br />
                   9 Ashok Marg, Hazratganj, LUCKNOW
-                  <br />
-                  Uttar Pradesh - 226001
+                  <br /> */}
+                  
+                  <div style={{textAlign:'end', display:'inline-block', width:'85%' }}>
+                    {CompanyDetails.map((row, company_id) => (
+                      <div style={{textAlign:'end'}}>{row.company_address} - <br /> {row.pincode}</div>
+                    ))}</div>
                 </p>
               </div>
               <div className="invoice-header" style={styles.invoiceHeader}>
-                <h2 style={styles.invoiceHeaderH2}>Tax Invoice</h2>
+               <div style={{display:'flex', justifyContent:'space-evenly'}}><h2 style={styles.invoiceHeaderH2}>Credit Note</h2>
+               {CompanyDetails.map((row, company_id) => (
+                      <div style={{display:'flex', margin:'5px', gap:'5px'}}><div style={{fontWeight:'bolder', textDecoration:'underline'}}>GSTIN/UIN: </div> 
+                      <div>{row.gst_in}</div></div>
+                    ))}</div>
                 <div className="invoice-details" style={styles.invoiceDetails}>
                   <div style={{ width: "60%" }}>
-                    <div>Invoice No.: {invoice.invoice_number}</div>
-                    <div>Invoice Date: {invoice.generated_date}</div>
-                    <div>Due Date: {invoice.generated_date}</div>
+                   <div>Credit Note No.: {invoice.invoice_number}</div>
+                    <div>Original Invoice No.: {invoice.invoice_number}</div>
+                    <div>Original Invoice Date: {invoice.generated_date}</div>
+                    {/* <div>Due Date: {invoice.generated_date}</div> */}
                     <div>State: {invoice.client_address}</div>
                   </div>
                   <div style={{ width: "40%" }}>
-                    {CompanyDetails.map((row, company_id) => (
-                      <div>GSTIN/UIN: {row.gst_in}</div>
-                    ))}
+                   
+                    <div>Credit Note Date: {invoice.client_pincode}</div>
                     <div>Ref. No. & Date: {invoice.client_pincode}</div>
-                    <div>Buyer Order No. & Date: {invoice.client_pincode}</div>
+                    {/* <div>Buyer Order No. & Date: {invoice.client_pincode}</div> */}
                     <div>Delivery Note: {invoice.client_pincode}</div>
                     <div>Destination: {invoice.client_pincode}</div>
                   </div>
@@ -613,7 +623,11 @@ function Invoice(props) {
               </div>
 
               <div className="invoice-buyer" style={styles.invoiceBuyer}>
-                <h2 style={styles.invoiceHeaderH2}>Buyer (Bill to Party)</h2>
+              <div style={{display:'flex', justifyContent:'space-evenly'}}><h2 style={styles.invoiceHeaderH2}>Buyer (Bill to Party)</h2>
+              {CompanyDetails.map((row, company_id) => (
+                      <div style={{display:'flex', margin:'5px', gap:'3px'}}> <div style={{fontWeight:'bolder', textDecoration:'underline'}}>GSTIN/UIN:</div>
+                      <div>{row.gst_in}</div></div>
+                    ))}</div>
                 <div className="buyer-details" style={styles.buyerdetails}>
                   <div style={{ width: "60%" }}>
                     <div>Name: {invoice.client_name}</div>
@@ -630,25 +644,23 @@ function Invoice(props) {
                     </div>
 
                   </div>
-                  <div className="buyerdetails">
-                    {CompanyDetails.map((row, company_id) => (
-                      <div>GSTIN/UIN: {row.gst_in}</div>
-                    ))}
-                  </div>
-                  
+                                   
                 </div>
               </div>
               <table className="invoice-table" style={styles.invoiceTable}>
                 <thead style={styles.invoiceTableTh}>
                   <tr>
-                    <th style={styles.invoiceTableTh}>SN</th>
-                    <th style={styles.invoiceTableTh}>Product Description</th>
-                    <th style={styles.invoiceTableTh}>Qty</th>
-                    <th style={styles.invoiceTableTh}>Rate Rs</th>
-                    <th style={styles.invoiceTableTh}>Taxable Value</th>
-                    <th style={styles.invoiceTableTh}>%</th>
-                    <th style={styles.invoiceTableTh}>IGST</th>
-                    <th style={styles.invoiceTableTh}>Total</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>SN</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>Product Description</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>Qty</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>Rate Rs</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>Taxable Value</th>
+                    <th style={styles.invoiceTableTh} colSpan='2'>IGST</th>
+                    <th style={styles.invoiceTableTh} rowSpan='2'>Total</th>
+                  </tr>
+                  <tr>
+                    <th>%</th>
+                    <th style={{border:'1px solid black'}}>Amount</th>
                   </tr>
                 </thead>
                 <tbody style={styles.invoiceTableTd}>
@@ -661,7 +673,7 @@ function Invoice(props) {
                       <td style={styles.invoiceTableTd}>{item.item_price}</td>
                       <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
                       <td style={styles.invoiceTableTd}>{item.tax_rate}</td>
-                      <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
+                      <td style={styles.invoiceTableTd}>{(item.tax_amount * item.tax_rate / 100).toFixed(2)}</td>
                       <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
                     </tr>
                   ))}
@@ -672,11 +684,17 @@ function Invoice(props) {
                     >
                       Total
                     </td>
-                    <td colSpan="2" style={styles.invoiceTableTd}>
+                    <td colSpan="1" style={styles.invoiceTableTd}>
                       {invoice.invoice_item_id.tax_rate}
                     </td>
-                    <td colSpan="2" style={styles.invoiceTableTd}>
+                    <td colSpan="1" style={styles.invoiceTableTd}>
                       {invoice.invoice_item_id.tax_amount}
+                    </td>
+                    <td style={styles.invoiceTableTd}>
+                      {invoice.total_amount}
+                    </td>
+                    <td style={styles.invoiceTableTd}>
+                      {invoice.total_amount}
                     </td>
                     <td style={styles.invoiceTableTd}>
                       {invoice.total_amount}
@@ -691,39 +709,39 @@ function Invoice(props) {
                 
                 <div className="total-words" style={styles.totalWords}>
                 <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
-                <p>{invoice.amountowords} Only</p>
+                <p style={{textTransform:"capitalize"}}>{invoice.amountowords} Only</p>
               </div>
               <div className="amount-summary" style={styles.amountSummary}>
-                <table className="invoice-table-amount">
-                  <tbody>
+                <table className="invoice-table-amount" style={{width:'-webkit-fill-available'}}>
+                  <tbody style={{border:'1px solid black'}}>
                     <tr>
-                      <td>
+                      <td style={{border:'1px solid black'}}>
                         Total Amount Before Tax: {invoice.total_amount}
                       </td>
                     </tr>
                     <tr>
-                      <td>IGST: {invoice.totalIGST}</td>
+                      <td style={{border:'1px solid black'}}>IGST: {invoice.totalIGST}</td>
                     </tr>
                     <tr>
-                      <td>Total Tax: {invoice.totalTax}</td>
+                      <td style={{border:'1px solid black'}}>Total Tax: {invoice.totalTax}</td>
                     </tr>
                     <tr>
-                      <td>
-                        Total Amount with Tax: {invoice.totalAmountWithTax}
+                      <td style={{border:'1px solid black'}}>
+                        Total Amount with Tax: {invoice.total_amount}
                       </td>
                     </tr>
                     <tr>
-                      <td>
-                        Net Amount Payable in Tax: {invoice.netAmountPayable}
+                      <td style={{border:'1px solid black'}}>
+                        Net Amount Payable in Tax: {invoice.total_amount}
                       </td>
                     </tr>
                     <tr>
-                      <td>
+                      <td style={{border:'1px solid black'}}>
                         Advance Amount Paid Rs.: {invoice.advanceAmountPaid}
                       </td>
                     </tr>
                     <tr>
-                      <td>
+                      <td style={{border:'1px solid black'}}>
                         Balance Amount Payable Rs.:{" "}
                         {invoice.balanceAmountPayable}
                       </td>
@@ -776,7 +794,7 @@ function Invoice(props) {
                   />
                   <img
                     style={styles.signatureImg}
-                    src={row.digital_signature}
+                    src={digital_signature}
                     alt="Seal"
                   />
                
@@ -790,7 +808,7 @@ function Invoice(props) {
             
               <Button
                 variant="contained"
-                color="primary"
+                sx={{backgroundColor:"#53B789"}}
                 // backgroundColor="green"
                 onClick={handlePrintPDF}
               >
@@ -798,6 +816,18 @@ function Invoice(props) {
               </Button>
               <Button
                 variant="contained"
+                sx={{backgroundColor:"#53B789"}}
+
+                color="secondary"
+                onClick={handleDownloadPDF}
+              >
+                Download
+              </Button>
+
+              <Button
+                variant="contained"
+                sx={{backgroundColor:"#53B789"}}
+
                 color="secondary"
                 onClick={handleDownloadPDF}
               >
@@ -816,9 +846,10 @@ function Invoice(props) {
 const styles = {
   invoice_table: {
     fontFamily: "Arial, sans-serif",
+    // borderRadius:"10px",
     margin: "20px auto",
-    border: "2px solid black",
-    width: "70%",
+    border: "6px double black",
+    width: "80%",
     display: "grid",
     gridTemplateAreas: `
 "header header"
@@ -892,6 +923,7 @@ const styles = {
     margin: 0,
     fontWeight: "bolder",
     padding: "10px",
+    lineHeight: "33px",
   },
   buyerdetails: {
     display: "flex",
@@ -906,7 +938,7 @@ const styles = {
   invoiceTableTh: {
     border: "1px solid black",
     padding: "8px",
-    textAlign: "left",
+    textAlign: "center",
   },
   invoiceTableTd: {
     border: "1px solid black",
@@ -921,7 +953,7 @@ const styles = {
   },
   amountSummary: {
     gridArea: "amount-summary",
-    marginTop: "-5px",
+    marginTop: "6px",
     fontWeight: "bold",
   },
   bankDetails: {
@@ -949,7 +981,7 @@ const styles = {
   },
   sealImg:{
     maxWidth: "100px",
-    marginLeft: "70px",
+    margin:'auto',
   },
   signatureImg: {
     maxWidth: "200px",

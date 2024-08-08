@@ -1,3 +1,3 @@
 
-const base_url = "https://clf7x9yxd49f.share.zrok.io"
+const base_url = "https://by6yw9k5skc4.share.zrok.io"
 export default base_url
