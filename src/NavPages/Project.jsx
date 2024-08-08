@@ -174,7 +174,7 @@ function Project(props) {
   };
 
   return (
-    <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
+    <Box sx={{ display: "flex", p: 10, marginLeft: 30 }}>
       <NavBar />
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
