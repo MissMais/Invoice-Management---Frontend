@@ -35,7 +35,8 @@ import autoTable from "jspdf-autotable";
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import sign_logo from '../assets/sign_logo.jpeg'
-
+import dummy_logo from '../assets/dummy_logo.jpeg'
+import { ToWords } from 'to-words';
 // import Bill from "../Bill"
 // import "../"
 
@@ -64,6 +65,7 @@ function Invoice(props) {
   const [totalAmount, setTotalAmount] = useState([]);
   const [error, setError] = useState("");
   const [invoice, setInvoice] = useState(null);
+  const [amountto, setamountto] = useState(null);
   const [CompanyDetails, setCompanyDetails] = useState(null);
   const invoiceRef = useRef();
   useEffect(() => {
@@ -257,9 +259,17 @@ function Invoice(props) {
   };
 
   const ViewPdf = (invoice_data_of_row) => {
-    setInvoice(invoice_data_of_row);
+     
+    var converter = require('number-to-words');
+    let words = converter.toWords(invoice_data_of_row.total_amount)
+    
+    setInvoice(
+      {...invoice_data_of_row,
+      amountowords : words}
+    );
 
     setIsInvoiceModalOpen(true);
+    
   };
 
   const handleCloseInvoiceModal = () => {
@@ -267,49 +277,7 @@ function Invoice(props) {
     setInvoiceData(null);
   };
 
-  // const handleDownloadPDF = () => {
-  //   const doc = new jsPDF();
-  //   doc.text("Invoice Details", 20, 10);
-  //   doc.autoTable({
-  //     startY: 20,
-  //     head: [
-  //       [
-  //         "Customer Name",
-  //         "Invoice Number",
-  //         "Order Number",
-  //         "Invoice Date",
-  //         "Due Date",
-  //       ],
-  //     ],
-  //     body: [
-  //       [
-  //         tableData.client_name,
-  //         invoiceData.client_name,
-  //         invoiceData.order_number,
-  //         invoiceData.invoice_date,
-  //         invoiceData.generated_date,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Description", "Quantity", "Price", "Amount"]],
-  //     body: [
-  //       [
-  //         invoiceData.description,
-  //         invoiceData.quantity,
-  //         invoiceData.price,
-  //         invoiceData.amount,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Notes"]],
-  //     body: [[invoiceData.notes]],
-  //   });
-  //   doc.save("invoice.pdf");
-  // };
+  
 
   const handlePrintPDF = useReactToPrint({
     content: () => invoiceRef.current,
@@ -329,62 +297,16 @@ function Invoice(props) {
   };
 
 
-  // const handlegetPDF = useReactToPrint({
-  //   content: () => invoiceRef.current,
-  //   documentTitle: 'invoice',
-  //   onAfterPrint: () => alert('Print successful'),
-  // });
-  // const handlePrintPDF = () => {
-  //   const doc = new jsPDF();
-  //   doc.text("Invoice Details", 20, 10);
-  //   doc.autoTable({
-  //     startY: 20,
-  //     head: [
-  //       [
-  //         "Customer Name",
-  //         "Invoice Number",
-  //         "Order Number",
-  //         "Invoice Date",
-  //         "Due Date",
-  //       ],
-  //     ],
-  //     body: [
-  //       [
-  //         invoiceData.client_name,
-  //         invoiceData.invoice_number,
-  //         invoiceData.order_number,
-  //         invoiceData.invoice_date,
-  //         invoiceData.generated_date,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Description", "Quantity", "Price", "Amount"]],
-  //     body: [
-  //       [
-  //         invoiceData.description,
-  //         invoiceData.quantity,
-  //         invoiceData.price,
-  //         invoiceData.amount,
-  //       ],
-  //     ],
-  //   });
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable.finalY + 10,
-  //     head: [["Notes"]],
-  //     body: [[invoiceData.notes]],
-  //   });
-  //   const blob = doc.output("blob");
-  //   const url = URL.createObjectURL(blob);
-  //   window.open(url);
-  // };
 
+<<<<<<< HEAD
   //  if (!invoice) {
   //                return (<div>Loading...</div>)
 
   //                       }
   const isSmallScreen = useMediaQuery("(max-width:600px)");
+=======
+
+>>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
   return (
     <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
       <NavBar />
@@ -655,16 +577,26 @@ function Invoice(props) {
             sx={{
               flexDirection: "column",
               position: "absolute",
+<<<<<<< HEAD
               top: "50%",
               bottom: "10%",
               left: "60%",
               transform: "translate(-50%, -50%)",
               width: isSmallScreen ? "90%" : "100%",
               height: isSmallScreen ? "90%" : "100%",
+=======
+              top: "1%",
+              bottom: "5%",
+              left: "15%",
+              // right: "20%",
+              // transform: "translate(-50%, -50%)",
+              width: "80%",
+              height: "100%",
+>>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
               bgcolor: "background.paper",
               border: "3px solid #455a64",
               boxShadow: 24,
-              p: 4,
+              // p: 4,
               borderRadius: 4,
               overflow: "scroll",
             }}
@@ -675,8 +607,8 @@ function Invoice(props) {
               </div>
               <div className="invoice-logo" style={styles.invoiceLogo}>
                 <img
-                  style={{ maxWidth: "100px" }}
-                  src={sign_logo}
+                  style={{ maxWidth: "175px" }}
+                  src={dummy_logo}
                   alt="Invoice logo"
                 />
               </div>
@@ -711,8 +643,8 @@ function Invoice(props) {
               </div>
 
               <div className="invoice-buyer" style={styles.invoiceBuyer}>
-                <h2 style={{ textAlign: "center" }}>Buyer (Bill to Party)</h2>
-                <div className="buyer-details">
+                <h2 style={styles.invoiceHeaderH2}>Buyer (Bill to Party)</h2>
+                <div className="buyer-details" style={styles.buyerdetails}>
                   <div style={{ width: "60%" }}>
                     <div>Name: {invoice.client_name}</div>
                     <div>Address: {invoice.client_address}</div>
@@ -728,37 +660,39 @@ function Invoice(props) {
                     </div>
 
                   </div>
-                  <div style={{ width: "40%" }}>
+                  <div className="buyerdetails">
                     {CompanyDetails.map((row, company_id) => (
                       <div>GSTIN/UIN: {row.gst_in}</div>
                     ))}
                   </div>
+                  
                 </div>
               </div>
               <table className="invoice-table" style={styles.invoiceTable}>
                 <thead style={styles.invoiceTableTh}>
                   <tr>
-                    <th>SN</th>
-                    <th>Product Description</th>
-                    <th>Qty</th>
-                    <th>Rate Rs</th>
-                    <th>Taxable Value</th>
-                    <th>%</th>
-                    <th>IGST</th>
-                    <th>Total</th>
+                    <th style={styles.invoiceTableTh}>SN</th>
+                    <th style={styles.invoiceTableTh}>Product Description</th>
+                    <th style={styles.invoiceTableTh}>Qty</th>
+                    <th style={styles.invoiceTableTh}>Rate Rs</th>
+                    <th style={styles.invoiceTableTh}>Taxable Value</th>
+                    <th style={styles.invoiceTableTh}>%</th>
+                    <th style={styles.invoiceTableTh}>IGST</th>
+                    <th style={styles.invoiceTableTh}>Total</th>
                   </tr>
                 </thead>
                 <tbody style={styles.invoiceTableTd}>
                   {invoice.invoice_item_id.map((item, index) => (
                     <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{item.project_name}</td>
-                      <td>{item.tax_id}</td>
-                      <td>{item.item_price}</td>
-                      <td>{item.tax_amount}</td>
-                      <td>{item.tax_rate}</td>
-                      <td>{item.tax_amount}</td>
-                      <td>{item.tax_amount}</td>
+                      <td style={styles.invoiceTableTd}>{index + 1}</td>
+                      <td style={styles.invoiceTableTd}>{item.project_name}</td>
+                      {/* <td style={styles.invoiceTableTd}>{item.tax_id}</td> */}
+                      <td style={styles.invoiceTableTd}>1</td>
+                      <td style={styles.invoiceTableTd}>{item.item_price}</td>
+                      <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
+                      <td style={styles.invoiceTableTd}>{item.tax_rate}</td>
+                      <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
+                      <td style={styles.invoiceTableTd}>{item.tax_amount}</td>
                     </tr>
                   ))}
                   <tr>
@@ -768,31 +702,33 @@ function Invoice(props) {
                     >
                       Total
                     </td>
-                    <td colSpan="2" style={{ fontWeight: "bold" }}>
+                    <td colSpan="2" style={styles.invoiceTableTd}>
                       {invoice.invoice_item_id.tax_rate}
                     </td>
-                    <td colSpan="2" style={{ fontWeight: "bold" }}>
+                    <td colSpan="2" style={styles.invoiceTableTd}>
                       {invoice.invoice_item_id.tax_amount}
                     </td>
-                    <td style={{ fontWeight: "bold" }}>
+                    <td style={styles.invoiceTableTd}>
                       {invoice.total_amount}
                     </td>
-                    <td style={{ fontWeight: "bold" }}>
+                    <td style={styles.invoiceTableTd}>
                       Rs {invoice.total_amount}
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div className="total-words" style={styles.totalWords}>
+      
+                
+                <div className="total-words" style={styles.totalWords}>
                 <p>Total Rounded off Invoice Amount in Words (Rupees)</p>
-                <p>{invoice.amountInWords}</p>
+                <p>{invoice.amountowords} Only</p>
               </div>
               <div className="amount-summary" style={styles.amountSummary}>
                 <table className="invoice-table-amount">
                   <tbody>
                     <tr>
                       <td>
-                        Total Amount Before Tax: {invoice.totalAmountBeforeTax}
+                        Total Amount Before Tax: {invoice.total_amount}
                       </td>
                     </tr>
                     <tr>
@@ -859,12 +795,12 @@ function Invoice(props) {
               </div>
               {CompanyDetails.map((row, company_id) => (
                 <div className="signature" style={styles.signature}>
-                  <h5 style={{ textAlign: "right" }}>
+                  <h5 style={{ textAlign: "center" }}>
                     <b>FOR</b>
                   </h5>
                   <img
                     style={styles.sealImg}
-                    // src={row.digital_seal}
+                    
                     src={sign_logo}
                     alt="Signature"
                   />
@@ -873,16 +809,19 @@ function Invoice(props) {
                     src={row.digital_signature}
                     alt="Seal"
                   />
-                  {/* <p>Authorized Signatory</p> */}
+               
                 </div>
               ))}
+              
             </div>
             <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+              sx={{ display: "flex", justifyContent:"center",gap:"10px", mt: 2 }}
             >
+            
               <Button
                 variant="contained"
                 color="primary"
+                // backgroundColor="green"
                 onClick={handlePrintPDF}
               >
                 Print
@@ -892,15 +831,10 @@ function Invoice(props) {
                 color="secondary"
                 onClick={handleDownloadPDF}
               >
-                Download PDF
+                Send to Email
               </Button>
-              {/* <Button
-                   variant="contained"
-                   color="info"
-                   onClick={handleEditInvoice}
-                 >
-                   Edit
-                 </Button> */}
+              
+            
             </Box>
           </Box>
         </Modal>
@@ -915,7 +849,11 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     margin: "20px auto",
     border: "2px solid black",
+<<<<<<< HEAD
     width:  "80%",
+=======
+    width: "70%",
+>>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
     display: "grid",
     gridTemplateAreas: `
 "header header"
@@ -943,6 +881,8 @@ const styles = {
   headH1: {
     fontFamily: "'Times New Roman', Times, serif",
     margin: 0,
+    fontSize:"23px",
+    fontWeight: "bold",
   },
   invoiceLogo: {
     gridArea: "logo",
@@ -988,19 +928,23 @@ const styles = {
     fontWeight: "bolder",
     padding: "10px",
   },
+  buyerdetails: {
+    display: "flex",
+    // justifyContent: "space-between",
+  },
   invoiceTable: {
     gridArea: "items-table",
     width: "100%",
-    borderCollapse: "collapse",
+    // borderCollapse: "collapse",
     marginTop: "20px",
   },
   invoiceTableTh: {
-    border: "1px solid #000",
+    border: "1px solid black",
     padding: "8px",
     textAlign: "left",
   },
   invoiceTableTd: {
-    border: "1px solid #000",
+    border: "1px solid black",
     padding: "8px",
     textAlign: "left",
   },
@@ -1040,7 +984,7 @@ const styles = {
   },
   sealImg:{
     maxWidth: "100px",
-    marginLeft: "50px",
+    marginLeft: "70px",
   },
   signatureImg: {
     maxWidth: "200px",
