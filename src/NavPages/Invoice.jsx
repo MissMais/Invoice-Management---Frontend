@@ -17,6 +17,7 @@ import {
   InputLabel,
   Modal,
   TextField,
+  useMediaQuery
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -93,6 +94,7 @@ function Invoice(props) {
     try {
       const response = await axios.get(`${base_url}/client/invoice/`);
       setTableData(response.data);
+      console.log("********************",response.data.length)
     } catch (err) {
       console.log(err);
       console.error("Error fetching data:", err);
@@ -382,11 +384,15 @@ function Invoice(props) {
   //                return (<div>Loading...</div>)
 
   //                       }
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
-    <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
+    <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
       <NavBar />
-
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, width: isSmallScreen ? "100%" : "auto" }}
+        aria-label="Payment Section"
+      >
       <Box
         sx={{
           display: "flex",
@@ -406,7 +412,7 @@ function Invoice(props) {
               mr: 2,
               "& .MuiOutlinedInput-root": {
                 height: "43px",
-                width: 780,
+                width: isSmallScreen ? "100%" : 1000,
                 borderRadius: 16,
               },
             }}
@@ -436,19 +442,21 @@ function Invoice(props) {
         aria-describedby="modal-description"
       >
         <Box
-          sx={{
-            flexDirection: "column",
-            position: "absolute",
-            top: "60%",
-            left: "60%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.paper",
-            border: "3px solid #455a64",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
-          }}
+           sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: isSmallScreen ? "100%" : '90%',
+                      maxWidth: 800,
+                      bgcolor: 'background.paper',
+                      boxShadow: 24,
+                      p: { xs: 2, sm: 4 },
+                      borderRadius: 2,
+                      maxHeight: '90vh',
+                      overflowY: 'auto',
+                    }}
+                    component="form"
         >
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Invoice" : "Add Invoice"}
@@ -537,7 +545,11 @@ function Invoice(props) {
           </Box>
         </Box>
       </Modal>
-      <TableContainer component={Paper} sx={{ marginTop: 5 }}>
+      <Box sx={{ display: "block" }}>
+        <TableContainer
+          component={Paper} 
+          sx={{ maxHeight: "100vh", marginTop: 5 }} 
+        >
         <Table>
           <TableHead sx={{ m: 5, backgroundColor: "#53B789" }}>
             <TableRow>
@@ -636,6 +648,7 @@ function Invoice(props) {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
       {invoice && (
         <Modal open={isInvoiceModalOpen} onClose={handleCloseInvoiceModal}>
           <Box
@@ -646,8 +659,8 @@ function Invoice(props) {
               bottom: "10%",
               left: "60%",
               transform: "translate(-50%, -50%)",
-              width: "100%",
-              height: "100%",
+              width: isSmallScreen ? "90%" : "100%",
+              height: isSmallScreen ? "90%" : "100%",
               bgcolor: "background.paper",
               border: "3px solid #455a64",
               boxShadow: 24,
@@ -893,6 +906,7 @@ function Invoice(props) {
         </Modal>
       )}
     </Box>
+    </Box>
   );
 }
 
@@ -901,7 +915,7 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     margin: "20px auto",
     border: "2px solid black",
-    width: "80%",
+    width:  "80%",
     display: "grid",
     gridTemplateAreas: `
 "header header"

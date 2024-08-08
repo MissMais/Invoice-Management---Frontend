@@ -17,6 +17,7 @@ import {
   Modal,
   Grid,
   TextField,
+  useMediaQuery
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -153,10 +154,16 @@ function Project(props) {
   const handleDelete = (client_id) => {
     deleteDataFromServer(client_id);
   };
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
-    <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
+    <>
+        <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
       <NavBar />
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, width: isSmallScreen ? "100%" : "auto" }}
+        aria-label="Payment Section"
+      >
 
       <Box
         sx={{
@@ -175,7 +182,7 @@ function Project(props) {
             mr: 2,
             "& .MuiOutlinedInput-root": {
               height: "43px",
-              width: 780,
+              width: isSmallScreen ? "100%" : 1000,
               borderRadius: 16,
             },
           }}
@@ -203,18 +210,20 @@ function Project(props) {
       >
         <Box
           sx={{
-            flexDirection: "column",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.paper",
-            border: "3px solid #455a64",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: isSmallScreen ? "100%" : '90%',
+            maxWidth: 800,
+            bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
+            p: { xs: 2, sm: 4 },
+            borderRadius: 2,
+            maxHeight: '90vh',
+            overflowY: 'auto',
           }}
+          component="form"
         >
           <Typography id="modal-title" component="h2">
             {editMode ? "Edit Client" : "Add Client"}
@@ -288,7 +297,11 @@ function Project(props) {
         </Box>
       </Modal>
 
-      <TableContainer component={Paper} sx={{ marginTop: 5 }}>
+      <Box sx={{ display: "block" }}>
+        <TableContainer
+          component={Paper} 
+          sx={{ maxHeight: "100vh", marginTop: 5 }} 
+        >
         <Table>
           <TableHead sx={{ backgroundColor: "#53B789" }}>
             <TableRow>
@@ -352,7 +365,10 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
     </Box>
+    </Box>
+    </>
   );
 }
 

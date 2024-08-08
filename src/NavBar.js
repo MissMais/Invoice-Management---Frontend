@@ -34,6 +34,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useMediaQuery } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -170,7 +171,7 @@ export default function NavBar() {
   const handleModalClose = () => {
     setModalOpen(false);
   };
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
     <Box sx={{ display: "flex" }} xs sm md>
       <CssBaseline />
@@ -407,17 +408,18 @@ export default function NavBar() {
             top: "45%",
             left: "55%",
             transform: "translate(-50%, -50%)",
-            width: 800,
+            width: isSmallScreen ? "100%" : 800,
             height: 300,
             bgcolor: "background.paper",
             border: "1px solid #000",
             borderRadius: 3,
             p: 3,
             boxShadow: 24,
+            overflowY:'auto'
           }}
         >
           <Grid container spacing={3}>
-            <Grid item xs={3}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="h8">
                 <GridViewOutlinedIcon /> GENERAL
               </Typography>
@@ -456,7 +458,7 @@ export default function NavBar() {
                 <br />
               </ul>
             </Grid>
-            <Grid item xs={3} sx={{ marginLeft: 6 }}>
+            <Grid Grid item xs={12} sm={4}>
               <Typography variant="h8">
                 <ShoppingCartOutlinedIcon /> SALES
               </Typography>
@@ -493,7 +495,7 @@ export default function NavBar() {
                 </li>
               </ul>
             </Grid>
-            <Grid item xs={3} sx={{ marginLeft: 6 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="h8">
                 <AccountBalanceOutlinedIcon /> BANKING
               </Typography>

@@ -15,6 +15,7 @@ import {
   FormControl,
   InputLabel,
   Modal,
+  useMediaQuery
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -179,10 +180,15 @@ function Project(props) {
   const handleDelete = (invoice_item_id) => {
     deleteDataFromServer(invoice_item_id);
   };
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
-    <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
-      <NavBar />
+    <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
+    <NavBar />
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, width: isSmallScreen ? "100%" : "auto" }}
+      aria-label="Payment Section"
+    >
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
           onClick={handleOpenModal}
@@ -206,19 +212,21 @@ function Project(props) {
         aria-describedby="modal-description"
       >
         <Box
-          sx={{
-            flexDirection: "column",
-            position: "absolute",
-            top: "60%",
-            left: "60%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.paper",
-            border: "3px solid #455a64",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
-          }}
+      sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: isSmallScreen ? "100%" : '90%',
+        maxWidth: 800,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: { xs: 2, sm: 4 },
+        borderRadius: 2,
+        maxHeight: '90vh',
+        overflowY: 'auto',
+      }}
+      component="form"
         >
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Invoice Item" : "Add Invoice Item"}
@@ -289,7 +297,7 @@ function Project(props) {
           </Box>
         </Box>
       </Modal>
-
+      <Box sx={{ display: "block" }}>
       <TableContainer
         component={Paper}
         sx={{ maxHeight: "100vh", marginTop: 5 }}
@@ -364,6 +372,8 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
+    </Box>
     </Box>
   );
 }
