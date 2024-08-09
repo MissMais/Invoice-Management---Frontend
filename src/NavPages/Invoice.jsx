@@ -36,7 +36,7 @@ import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import sign_logo from '../assets/sign_logo.jpeg'
 import dummy_logo from '../assets/dummy_logo.jpeg'
-import { ToWords } from 'to-words';
+// import { ToWords } from 'to-words';
 // import Bill from "../Bill"
 // import "../"
 
