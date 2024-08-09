@@ -298,15 +298,8 @@ function Invoice(props) {
 
 
 
-<<<<<<< HEAD
-  //  if (!invoice) {
-  //                return (<div>Loading...</div>)
-
-  //                       }
   const isSmallScreen = useMediaQuery("(max-width:600px)");
-=======
 
->>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
   return (
     <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
       <NavBar />
@@ -577,22 +570,14 @@ function Invoice(props) {
             sx={{
               flexDirection: "column",
               position: "absolute",
-<<<<<<< HEAD
               top: "50%",
               bottom: "10%",
               left: "60%",
               transform: "translate(-50%, -50%)",
               width: isSmallScreen ? "90%" : "100%",
               height: isSmallScreen ? "90%" : "100%",
-=======
-              top: "1%",
-              bottom: "5%",
-              left: "15%",
-              // right: "20%",
-              // transform: "translate(-50%, -50%)",
               width: "80%",
               height: "100%",
->>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
               bgcolor: "background.paper",
               border: "3px solid #455a64",
               boxShadow: 24,
@@ -849,11 +834,7 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     margin: "20px auto",
     border: "2px solid black",
-<<<<<<< HEAD
     width:  "80%",
-=======
-    width: "70%",
->>>>>>> 9c3a2437617eb7f8096fd37a69bbf387f8dfaff3
     display: "grid",
     gridTemplateAreas: `
 "header header"
