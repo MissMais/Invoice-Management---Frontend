@@ -4,10 +4,10 @@ import { Box, useMediaQuery } from '@mui/material';
 import NavBar from '../NavBar';
 
 function Payment(props) {
-    const isSmallScreen = useMediaQuery('(max-width:400px)');
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
 
     return (
-        <Box sx={{ display: 'flex', p: 10 }}>
+        <Box sx={{ display: 'flex', paddingY: 10 , paddingX:5 }}>
             <NavBar />
             <Box 
                 component="main" 

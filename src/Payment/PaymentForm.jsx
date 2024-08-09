@@ -8,6 +8,7 @@ import {
   FormControl,
   InputLabel,
   Modal,
+  useMediaQuery
 } from "@mui/material";
 
 export default function PaymentForm({ addData, edit, open, onClose }) {
@@ -26,6 +27,7 @@ export default function PaymentForm({ addData, edit, open, onClose }) {
     addData(data, Object.keys(edit || {}).length > 0);
     onClose();
   };
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   return (
     <>
@@ -39,16 +41,18 @@ export default function PaymentForm({ addData, edit, open, onClose }) {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "3px solid #455a64",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: isSmallScreen ? "100%" : '90%',
+            maxWidth: 800,
+            bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
+            p: { xs: 2, sm: 4 },
+            borderRadius: 2,
+            maxHeight: '90vh',
+            overflowY: 'auto',
           }}
         >
           <FormControl fullWidth margin="normal">

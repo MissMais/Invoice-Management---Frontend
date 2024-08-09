@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { Button, Box, Table, TableBody, TableCell, TextField, IconButton, TableContainer, TableHead, TableRow, Paper, } from '@mui/material';
+import { Button, Box, Table, TableBody,useMediaQuery, TableCell, TextField, IconButton, TableContainer, TableHead, TableRow, Paper, } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -9,7 +9,7 @@ export default function PaymentTable({ data, edit, dlt, setOpen }) {
     edit({});
     setOpen(true);
   };
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
     <>
       <Box sx={{ display: 'block'  }}>
@@ -20,7 +20,15 @@ export default function PaymentTable({ data, edit, dlt, setOpen }) {
             placeholder="Enter the Invoice ID"
             onChange={(e) => setSearch(e.target.value)}
             variant="outlined"
-            sx={{ flex: 1, mr: 2, '& .MuiOutlinedInput-root': {height: '43px', width:780, borderRadius: 16 } }}
+            sx={{
+              flex: 1,
+              mr: 2,
+              "& .MuiOutlinedInput-root": {
+                height: "43px",
+                width: isSmallScreen ? "100%" : 1000,
+                borderRadius: 16,
+              },
+            }}
           />
           <Button
             onClick={handleAddClick}
@@ -31,9 +39,13 @@ export default function PaymentTable({ data, edit, dlt, setOpen }) {
             ADD
           </Button>
         </Box>
-        <TableContainer component={Paper} sx={{ maxHeight: '100vh', marginTop: 5, bgcolor: "#53B789" }}>
+        <Box sx={{ display: "block" }}>
+        <TableContainer
+          component={Paper} 
+          sx={{ maxHeight: "100vh", marginTop: 5 }} 
+        >
           <Table>
-            <TableHead sx={{ m: 5, backgroundColor: '#53B789' }}>
+            <TableHead sx={{ backgroundColor: '#53B789' }}>
               <TableRow>
                 <TableCell sx={{ color: 'white', textAlign: 'center' }}>Payment ID</TableCell>
                 <TableCell sx={{ color: 'white', textAlign: 'center' }}>Invoice ID</TableCell>
@@ -70,6 +82,7 @@ export default function PaymentTable({ data, edit, dlt, setOpen }) {
             </TableBody>
           </Table>
         </TableContainer>
+        </Box>
       </Box>
     </>
   );

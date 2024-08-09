@@ -17,6 +17,7 @@ import {
   InputLabel,
   Modal,
   List,
+  useMediaQuery
 } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
@@ -172,10 +173,15 @@ function Project(props) {
   const handleDelete = (project_id) => {
     deleteDataFromServer(project_id);
   };
-
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   return (
-    <Box sx={{ display: "block", p: 10, marginLeft: 30 }}>
-      <NavBar />
+    <Box sx={{ display: "flex", p: 10, flexDirection : isSmallScreen ? "column" : "row"}} >
+    <NavBar />
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, width: isSmallScreen ? "100%" : "auto" }}
+      aria-label="Payment Section"
+    >
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
           onClick={handleOpenModal}
@@ -199,19 +205,21 @@ function Project(props) {
         aria-describedby="modal-description"
       >
         <Box
-          sx={{
-            flexDirection: "column",
-            position: "absolute",
-            top: "60%",
-            left: "60%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.paper",
-            border: "3px solid #455a64",
+           sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: isSmallScreen ? "100%" : '90%',
+            maxWidth: 800,
+            bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
+            p: { xs: 2, sm: 4 },
+            borderRadius: 2,
+            maxHeight: '90vh',
+            overflowY: 'auto',
           }}
+          component="form"
         >
           <Typography id="modal-title" component="main" sx={{ flexGrow: 1 }}>
             {editMode ? "Edit Project" : "Add Project"}
@@ -315,7 +323,11 @@ function Project(props) {
         </Box>
       </Modal>
 
-      <TableContainer component={Paper} sx={{ marginTop: 5 }}>
+      <Box sx={{ display: "block" }}>
+        <TableContainer
+          component={Paper} 
+          sx={{ maxHeight: "100vh", marginTop: 5 }} 
+        >
         <Table>
           <TableHead sx={{ m: 5, backgroundColor: "#53B789" }}>
             <TableRow>
@@ -401,6 +413,8 @@ function Project(props) {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
+      </Box>
     </Box>
   );
 }
